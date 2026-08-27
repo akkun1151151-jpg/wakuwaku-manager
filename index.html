@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>わくわく管理 v1.2.2</title>
+<title>わくわく管理 v1.2.3</title>
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png">
 <link rel="apple-touch-icon" sizes="180x180" href="./icons/icon-180.png">
@@ -27,7 +27,7 @@ input,select{border:1px solid #dfe2e8;border-radius:10px;padding:10px 12px;backg
 </style>
 </head>
 <body>
-<header><div class="logo">⭐ わくわく管理 <span class="muted">v1.2.2</span></div><div class="nav"><button id="navChars" class="active">キャラ管理</button><button id="navParty">高難易度編成</button><button id="navSettings">設定</button></div></header>
+<header><div class="logo">⭐ わくわく管理 <span class="muted">v1.2.3</span></div><div class="nav"><button id="navChars" class="active">キャラ管理</button><button id="navParty">高難易度編成</button><button id="navSettings">設定</button></div></header>
 <main id="app"></main>
 <script>
 if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js").catch(function(e){console.warn("PWA service worker registration failed",e);});});}
@@ -489,7 +489,7 @@ function registerCurrentParty(){
  }else{
   state.savedParties.push({id:'party_'+Date.now()+'_'+Math.random().toString(36).slice(2),name:name,groupId:groupId,guardianId:state.guardianId||"",slots:slots});
  }
- partyNameDraft='';save();renderParty();
+ partyNameDraft='';try{localStorage.removeItem('wakuwaku_party_name_draft');}catch(e){}save();renderParty();
 }
 function editSavedParty(id){
  var p=state.savedParties.find(function(x){return String(x.id)===String(id);});
@@ -531,6 +531,7 @@ function renderSavedParty(p){
  h+='</div></div>';return h;
 }
 function renderParty(){
+ if(!editingSavedPartyId && !partyNameDraft){try{partyNameDraft=localStorage.getItem('wakuwaku_party_name_draft')||'';}catch(e){}}
  var chars=state.chars;
  var activeSlot=Math.max(0,Math.min(3,partyPickSlot)); partyPickSlot=activeSlot;
  var active=state.party[activeSlot]||{id:"",accountIndex:0};
@@ -556,7 +557,7 @@ function renderParty(){
  }
  h+='</div></div>';
  h+='<div class="card" style="margin-top:14px"><b>守護獣</b><p class="muted">守護獣は4キャラとは別枠で管理します。わくわくの実は付きません。</p><div class="guardian-panel"><div class="guardian-preview"><div class="party-avatar">'+(pg&&pg.image?'<img src="'+pg.image+'" alt="">':'🛡️')+'</div><div><div class="muted" style="font-size:12px">現在の守護獣</div><b>'+esc(pg?pg.name:'未選択')+'</b></div></div><div class="guardian-controls"><select id="guardianSelect" class="wide"><option value="">未選択</option>'+state.guardians.map(function(g){return '<option value="'+esc(g.id)+'" '+(String(g.id)===String(state.guardianId)?'selected':'')+'>'+esc(g.name)+'</option>';}).join('')+'</select><button class="btn" id="addGuardianBtn">守護獣を追加</button><label class="btn" style="cursor:pointer">画像変更<input id="guardianImageInput2" type="file" accept="image/*" style="display:none"></label>'+(pg?'<button class="btn danger" id="clearGuardianBtn">解除</button>':'')+'</div></div></div>';
- h+='<div class="card" style="margin-top:14px"><div class="party-register-bar"><input id="partyNameInput" class="wide" placeholder="〇〇用（例：天魔1の間用）" value="'+esc(partyNameDraft)+'"><select id="partyGroupSelect" class="wide"><option value="">未分類</option>'+state.partyGroups.map(function(g){return '<option value="'+esc(g.id)+'" '+(String(g.id)===String(partyGroupDraft)?'selected':'')+'>'+esc(g.name)+'</option>';}).join('')+'</select><button class="btn" id="createPartyGroupBtn">グループ作成</button><button class="btn primary" id="registerPartyBtn">'+(editingSavedPartyId?'変更を保存':'登録')+'</button>'+(editingSavedPartyId?'<button class="btn" id="cancelPartyEditBtn">編集をキャンセル</button>':'')+'</div><input id="guardianImageInput" type="file" accept="image/*" style="display:none"></div>';
+ h+='<div class="card" style="margin-top:14px"><b>編成を登録</b><p class="muted" style="margin:5px 0 10px">編成名を入力してから、分類を選択できます。キャラを選び直しても入力内容は保持されます。</p><div style="display:grid;grid-template-columns:1fr;gap:9px"><div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:5px">〇〇用</label><input id="partyNameInput" class="wide" placeholder="例：星墓 第1の間用" value="'+esc(partyNameDraft)+'"></div><div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:5px">分類</label><select id="partyGroupSelect" class="wide"><option value="">未分類</option>'+state.partyGroups.map(function(g){return '<option value="'+esc(g.id)+'" '+(String(g.id)===String(partyGroupDraft)?'selected':'')+'>'+esc(g.name)+'</option>';}).join('')+'</select></div><div class="party-register-bar" style="margin-top:0"><button class="btn" id="createPartyGroupBtn">グループ作成</button><button class="btn primary" id="registerPartyBtn">'+(editingSavedPartyId?'変更を保存':'登録')+'</button>'+(editingSavedPartyId?'<button class="btn" id="cancelPartyEditBtn">編集をキャンセル</button>':'')+'</div></div><input id="guardianImageInput" type="file" accept="image/*" style="display:none"></div>';
  h+='<div class="card" style="margin-top:14px"><b>高難易度編成グループ</b><p class="muted" style="margin:5px 0 10px">「星墓」「天魔」などのグループを作って編成をまとめられます。</p><div style="display:flex;gap:8px;flex-wrap:wrap"><input id="partyGroupInput" class="wide" placeholder="新しいグループ名（例：星墓）" value="'+esc(partyGroupDraft&&state.partyGroups.find(function(g){return String(g.id)===String(partyGroupDraft);})?state.partyGroups.find(function(g){return String(g.id)===String(partyGroupDraft);}).name:'')+'"><button class="btn" id="createPartyGroupTopBtn">グループ作成</button><select id="partyGroupFilter" class="wide"><option value="すべて">すべてのグループ</option><option value="">未分類</option>'+state.partyGroups.map(function(g){return '<option value="'+esc(g.id)+'" '+(String(partyGroupFilter)===String(g.id)?'selected':'')+'>'+esc(g.name)+'</option>';}).join('')+'</select></div></div>';h+='<div class="title" style="margin-top:24px">登録済みの高難易度編成</div>';
  var visibleSaved=state.savedParties.filter(function(p){return partyGroupFilter==='すべて'||String(p.groupId||'')===String(partyGroupFilter);});if(visibleSaved.length)visibleSaved.slice().reverse().forEach(function(p){h+=renderSavedParty(p);});else h+='<div class="saved-party-empty">まだ登録された編成はありません。編成を作って「登録」を押してください。</div>';
  if(!chars.length)h+='<div class="card"><b>キャラが登録されていません</b><p class="muted">設定 → キャラを追加から登録してください。</p></div>';
@@ -567,7 +568,7 @@ function renderParty(){
  var gs=document.getElementById('guardianSelect');if(gs)gs.onchange=function(){state.guardianId=this.value;save();renderParty();};var ga=document.getElementById('addGuardianBtn');if(ga)ga.onclick=addGuardian;var gi=document.getElementById('guardianImageInput2');if(gi)gi.onchange=function(){updateGuardianImage(this.files&&this.files[0]);};var gc=document.getElementById('clearGuardianBtn');if(gc)gc.onclick=clearGuardian;var chg=document.getElementById('changeGuardianBtn');if(chg)chg.onclick=function(){var el=document.getElementById('guardianSelect');if(el){el.focus();el.scrollIntoView({behavior:'smooth',block:'center'});}};
  document.getElementById('inlinePartyAccount').onchange=function(){state.party[partyPickSlot].accountIndex=parseInt(this.value,10)||0;save();renderParty();};
  var ps=document.getElementById('inlinePartySearch'); ps.oninput=function(){partySearchDrafts[partyPickSlot]=this.value;}; ps.onkeydown=function(e){if(e.key==='Enter'&&!e.isComposing){e.preventDefault();partySearchDrafts[partyPickSlot]=this.value;drawInlinePartyPicker();}};
- document.getElementById('partyNameInput').oninput=function(){partyNameDraft=this.value;};
+ document.getElementById('partyNameInput').oninput=function(){partyNameDraft=this.value;try{localStorage.setItem('wakuwaku_party_name_draft',partyNameDraft);}catch(e){}};
  document.getElementById('registerPartyBtn').onclick=registerCurrentParty;
  var cancelBtn=document.getElementById('cancelPartyEditBtn');if(cancelBtn)cancelBtn.onclick=cancelEditSavedParty;
  document.querySelectorAll('[data-edit-saved-party]').forEach(function(btn){btn.onclick=function(){editSavedParty(this.getAttribute('data-edit-saved-party'));};});
