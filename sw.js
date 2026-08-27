@@ -1,4 +1,4 @@
-const CACHE_NAME = 'wakuwaku-manager-v1.1.1';
+const CACHE_NAME = 'wakuwaku-manager-v1.1.1-iconfix';
 const APP_SHELL = [
   './',
   './index.html',
