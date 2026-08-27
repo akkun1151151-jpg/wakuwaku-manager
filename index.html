@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>わくわく管理 v1.2.1</title>
+<title>わくわく管理 v1.2.2</title>
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png">
 <link rel="apple-touch-icon" sizes="180x180" href="./icons/icon-180.png">
@@ -27,7 +27,7 @@ input,select{border:1px solid #dfe2e8;border-radius:10px;padding:10px 12px;backg
 </style>
 </head>
 <body>
-<header><div class="logo">⭐ わくわく管理 <span class="muted">v1.2.1</span></div><div class="nav"><button id="navChars" class="active">キャラ管理</button><button id="navParty">高難易度編成</button><button id="navSettings">設定</button></div></header>
+<header><div class="logo">⭐ わくわく管理 <span class="muted">v1.2.2</span></div><div class="nav"><button id="navChars" class="active">キャラ管理</button><button id="navParty">高難易度編成</button><button id="navSettings">設定</button></div></header>
 <main id="app"></main>
 <script>
 if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js").catch(function(e){console.warn("PWA service worker registration failed",e);});});}
@@ -37,6 +37,8 @@ if("serviceWorker" in navigator){window.addEventListener("load",function(){navig
 var state={accounts:["メイン","サブ1","サブ2","サブ3","サブ4"],chars:[],guardians:[],party:[{id:"",accountIndex:0},{id:"",accountIndex:0},{id:"",accountIndex:0},{id:"",accountIndex:0}],guardianId:"",savedParties:[],partyGroups:[]};
 var filter={q:"",attr:"すべて",type:"すべて",form:"すべて",sort:"属性→名前"};
 var searchDraft="";
+var settingsCharFilter={q:"",attr:"すべて",type:"すべて",shot:"すべて",sort:"新しい順"};
+var settingsCharSearchDraft="";
 var partyPickSlot=0,partySearchDrafts=["","","",""];
 var partyPickerAttr="すべて",partyPickerType="すべて",partyPickerShot="すべて";
 var partyNameDraft="",partyGroupDraft="",partyGroupFilter="すべて";
@@ -225,60 +227,36 @@ function renderChars(){
   btn.onclick=function(){openWaku(btn.getAttribute("data-waku-id"),parseInt(btn.getAttribute("data-waku-index"),10));};
  });
 }
+function formatCharName(name){return esc(String(name||"")).replace(/\s+/g,"<br>");}
 function renderSettings(){
  var h='<div class="card cloud-account"><b>クラウドアカウント</b><div class="muted">ログイン中：'+esc((cloudUser&&cloudUser.user_metadata&&cloudUser.user_metadata.username)||((cloudUser&&cloudUser.email)||""))+'</div><button class="btn" id="logoutBtn">ログアウト</button></div>';
  h+='<div class="title">設定</div><div class="card"><b>アカウント数</b><div class="toolbar">';
  [2,3,4,5].forEach(function(n){h+='<button class="btn '+(state.accounts.length===n?'primary':'')+'" data-count="'+n+'">'+n+'垢</button>';});
  h+='</div><p class="muted">2〜5垢で切り替えできます。</p></div><div class="card"><b>アカウント名</b>';
  state.accounts.forEach(function(a,i){h+='<p><input data-account-index="'+i+'" value="'+esc(a)+'"></p>';});
- h+='</div><div class="card"><b>キャラ管理</b><p class="muted">追加済みのキャラは右側の「編集」から、よみがな・属性・分類・進化形態・種族・戦型・撃種・画像を変更できます。</p><div class="card" style="margin-top:14px"><b>データの移行</b><p class="muted">ChromeからFirefoxなど別のブラウザへ移すときに使えます。画像・キャラ・わくわくの実・編成などをまとめて保存します。</p><div style="display:flex;gap:8px;flex-wrap:wrap"><button id="exportData" class="btn">バックアップを書き出す</button><label class="btn" style="cursor:pointer">バックアップを読み込む<input id="importData" type="file" accept="application/json" style="display:none"></label></div></div><button id="addChar" class="btn primary">キャラを追加</button><div class="char-edit-list">';
- state.chars.forEach(function(c){
-  h+='<div class="char-edit-row"><div class="char-edit-left"><div class="char-edit-avatar">'+(c.image?'<img src="'+c.image+'" alt="">':'⭐')+'</div><div class="char-edit-info"><div class="char-edit-name">'+esc(c.name)+'</div><div class="char-edit-meta">'+esc(c.kana||"よみがな未登録")+' / '+esc(c.attr)+' / '+esc(c.type)+' / '+esc(c.form)+' / '+esc(c.race||"種族未設定")+' / '+esc(c.battleType||"")+' / '+esc(c.shotType||"")+'</div></div></div><button class="btn" data-edit-char="'+esc(c.id)+'">編集</button></div>';
- });
- if(!state.chars.length)h+='<p class="muted">まだキャラが登録されていません。</p>';
+ h+='</div><div class="card"><b>キャラ管理</b><p class="muted">追加済みのキャラは右側の「編集」から、よみがな・属性・分類・進化形態・種族・戦型・撃種・画像を変更できます。</p>';
+ h+='<div class="card" style="margin-top:14px"><b>データの移行</b><p class="muted">ChromeからFirefoxなど別のブラウザへ移すときに使えます。画像・キャラ・わくわくの実・編成などをまとめて保存します。</p><div style="display:flex;gap:8px;flex-wrap:wrap"><button id="exportData" class="btn">バックアップを書き出す</button><label class="btn" style="cursor:pointer">バックアップを読み込む<input id="importData" type="file" accept="application/json" style="display:none"></label></div></div>';
+ h+='<button id="addChar" class="btn primary">キャラを追加</button>';
+ h+='<div class="toolbar" style="margin-top:14px"><input id="settingsCharSearch" class="search" placeholder="キャラ名・よみがなで検索（Enterで検索）" value="'+esc(settingsCharSearchDraft)+'"><button id="settingsCharSearchBtn" class="btn primary">検索</button><select id="settingsCharAttr"><option>すべて</option><option>火</option><option>水</option><option>木</option><option>光</option><option>闇</option></select><select id="settingsCharType"><option>すべて</option><option>恒常</option><option>限定</option><option>コラボ</option></select><select id="settingsCharShot"><option>すべて</option><option>反射</option><option>貫通</option></select><select id="settingsCharSort"><option>新しい順</option><option>古い順</option><option>名前順</option><option>属性→名前</option><option>分類→名前</option><option>撃種→名前</option></select><button id="settingsCharReset" class="btn">リセット</button></div>';
+ var list=state.chars.map(function(c,i){return {c:c,i:i};});
+ list=list.filter(function(x){var c=x.c,q=normalizeSearch(settingsCharFilter.q);return (!q||normalizeSearch(c.name).indexOf(q)>=0||normalizeSearch(c.kana||'').indexOf(q)>=0)&&(settingsCharFilter.attr==='すべて'||c.attr===settingsCharFilter.attr)&&(settingsCharFilter.type==='すべて'||c.type===settingsCharFilter.type)&&(settingsCharFilter.shot==='すべて'||c.shotType===settingsCharFilter.shot);});
+ list.sort(function(a,b){var ca=a.c,cb=b.c,ta=Number(ca.createdAt||0),tb=Number(cb.createdAt||0);if(settingsCharFilter.sort==='新しい順')return(tb-ta)||(b.i-a.i);if(settingsCharFilter.sort==='古い順')return(ta-tb)||(a.i-b.i);if(settingsCharFilter.sort==='名前順')return(ca.name||'').localeCompare(cb.name||'','ja')||(b.i-a.i);if(settingsCharFilter.sort==='属性→名前')return(ca.attr||'').localeCompare(cb.attr||'','ja')||(ca.name||'').localeCompare(cb.name||'','ja');if(settingsCharFilter.sort==='分類→名前')return(ca.type||'').localeCompare(cb.type||'','ja')||(ca.name||'').localeCompare(cb.name||'','ja');if(settingsCharFilter.sort==='撃種→名前')return(ca.shotType||'').localeCompare(cb.shotType||'','ja')||(ca.name||'').localeCompare(cb.name||'','ja');return b.i-a.i;});
+ h+='<div class="char-edit-list">';
+ list.forEach(function(x){var c=x.c;h+='<div class="char-edit-row"><div class="char-edit-left"><div class="char-edit-avatar">'+(c.image?'<img src="'+c.image+'" alt="">':'⭐')+'</div><div class="char-edit-info"><div class="char-edit-name">'+formatCharName(c.name)+'</div><div class="char-edit-meta">'+esc(c.kana||"よみがな未登録")+' / '+esc(c.attr)+' / '+esc(c.type)+' / '+esc(c.form)+' / '+esc(c.race||"種族未設定")+' / '+esc(c.battleType||"")+' / '+esc(c.shotType||"")+'</div></div></div><button class="btn" data-edit-char="'+esc(c.id)+'">編集</button></div>';});
+ if(!list.length)h+='<p class="muted">条件に一致するキャラがいません。</p>';
  h+='</div></div>';
- document.getElementById("app").innerHTML=h;
- document.getElementById("logoutBtn").onclick=logout;
- document.querySelectorAll("[data-count]").forEach(function(btn){
-  btn.onclick=function(){
-   var n=parseInt(btn.getAttribute("data-count"),10),old=state.accounts.slice();
-   state.accounts=[];
-   for(var i=0;i<n;i++)state.accounts.push(old[i]||("サブ"+i));
-   state.chars.forEach(function(c){
-    var oldOwned=c.owned||[],oldWaku=c.waku||[];
-    c.owned=Array.from({length:n},function(_,i){return oldOwned[i]!==undefined?!!oldOwned[i]:true;});
-    c.waku=Array.from({length:n},function(_,i){return oldWaku[i]||[];});
-   });
-   save();renderSettings();
-  };
- });
- document.querySelectorAll("[data-account-index]").forEach(function(inp){
-  inp.onchange=function(){var i=parseInt(inp.getAttribute("data-account-index"),10);state.accounts[i]=inp.value.trim()||("アカウント"+(i+1));save();};
- });
-
- var exportBtn=document.getElementById("exportData");
- if(exportBtn)exportBtn.onclick=function(){
-  var blob=new Blob([JSON.stringify(state,null,2)],{type:"application/json"});
-  var a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="wakuwaku_manager_backup.json";a.click();
-  setTimeout(function(){URL.revokeObjectURL(a.href);},1000);
- };
- var importInput=document.getElementById("importData");
- if(importInput)importInput.onchange=function(){
-  var file=this.files&&this.files[0];if(!file)return;
-  var reader=new FileReader();
-  reader.onload=function(){try{
-   var incoming=JSON.parse(reader.result);
-   if(!incoming||!Array.isArray(incoming.chars)||!Array.isArray(incoming.accounts))throw new Error();
-   if(!confirm("現在のデータをバックアップファイルの内容で置き換えます。よろしいですか？"))return;
-   state=incoming;save();alert("データを復元しました。");renderSettings();
-  }catch(e){alert("バックアップファイルを読み込めませんでした。");}};
-  reader.readAsText(file);this.value="";
- };
- document.getElementById("addChar").onclick=function(){openCharEditor();};
- document.querySelectorAll("[data-edit-char]").forEach(function(btn){
-  btn.onclick=function(){openCharEditor(btn.getAttribute("data-edit-char"));};
- });
+ document.getElementById("app").innerHTML=h;document.getElementById("logoutBtn").onclick=logout;
+ document.querySelectorAll("[data-count]").forEach(function(btn){btn.onclick=function(){var n=parseInt(btn.getAttribute("data-count"),10),old=state.accounts.slice();state.accounts=[];for(var i=0;i<n;i++)state.accounts.push(old[i]||("サブ"+(i+1)));state.chars.forEach(function(c){c.owned=c.owned||[];c.waku=c.waku||[];while(c.owned.length<n)c.owned.push(true);while(c.waku.length<n)c.waku.push([]);c.owned=c.owned.slice(0,n);c.waku=c.waku.slice(0,n);});save();renderSettings();};});
+ document.querySelectorAll("[data-account-index]").forEach(function(inp){inp.onchange=function(){var i=parseInt(inp.getAttribute("data-account-index"),10);state.accounts[i]=inp.value.trim()||("サブ"+(i+1));save();};});
+ document.getElementById("addChar").onclick=function(){openCharEditor(null);};document.querySelectorAll("[data-edit-char]").forEach(function(btn){btn.onclick=function(){openCharEditor(btn.getAttribute("data-edit-char"));};});
+ document.getElementById("exportData").onclick=exportData;document.getElementById("importData").onchange=importData;
+ document.getElementById("settingsCharAttr").value=settingsCharFilter.attr;document.getElementById("settingsCharType").value=settingsCharFilter.type;document.getElementById("settingsCharShot").value=settingsCharFilter.shot;document.getElementById("settingsCharSort").value=settingsCharFilter.sort;
+ document.getElementById("settingsCharSearchBtn").onclick=function(){settingsCharFilter.q=(document.getElementById("settingsCharSearch").value||"").trim();settingsCharSearchDraft=settingsCharFilter.q;renderSettings();};
+ document.getElementById("settingsCharSearch").onkeydown=function(e){if(e.key==='Enter'){e.preventDefault();document.getElementById("settingsCharSearchBtn").click();}};
+ document.getElementById("settingsCharAttr").onchange=function(){settingsCharFilter.attr=this.value;renderSettings();};document.getElementById("settingsCharType").onchange=function(){settingsCharFilter.type=this.value;renderSettings();};document.getElementById("settingsCharShot").onchange=function(){settingsCharFilter.shot=this.value;renderSettings();};document.getElementById("settingsCharSort").onchange=function(){settingsCharFilter.sort=this.value;renderSettings();};
+ document.getElementById("settingsCharReset").onclick=function(){settingsCharFilter={q:"",attr:"すべて",type:"すべて",shot:"すべて",sort:"新しい順"};settingsCharSearchDraft="";renderSettings();};
 }
+
 function openCharEditor(editId){
  var editing=editId?state.chars.find(function(x){return String(x.id)===String(editId);}):null;
  if(editId&&!editing)return;
@@ -337,7 +315,7 @@ function openCharEditor(editId){
    if(editing){
     editing.name=nameValue;editing.kana=kanaValue;editing.image=imageValue;editing.attr=selected.attr;editing.type=selected.type;editing.form=selected.form;editing.race=selected.race;editing.battleType=selected.battleType;editing.shotType=selected.shotType;
    }else{
-    state.chars.push({id:String(Date.now())+Math.random(),name:nameValue,kana:kanaValue,image:imageValue,attr:selected.attr,type:selected.type,form:selected.form,race:selected.race,battleType:selected.battleType,shotType:selected.shotType,owned:state.accounts.map(function(){return true;}),waku:state.accounts.map(function(){return [];})});
+    state.chars.push({id:String(Date.now())+Math.random(),createdAt:Date.now(),name:nameValue,kana:kanaValue,image:imageValue,attr:selected.attr,type:selected.type,form:selected.form,race:selected.race,battleType:selected.battleType,shotType:selected.shotType,owned:state.accounts.map(function(){return true;}),waku:state.accounts.map(function(){return [];})});
    }
    save();
    var savedChar=editing||state.chars[state.chars.length-1];
