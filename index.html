@@ -37,7 +37,7 @@ var SUPABASE_URL="https://idvezmmaybviqivdcqdv.supabase.co";
 var SUPABASE_KEY="sb_publishable_wj1wG-EZeRwddutcvHlfPA_3ySqMX0c";
 var supa=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 var cloudReady=false, cloudUser=null, cloudTimer=null, syncing=false;
-function usernameEmail(u){return String(u||"").trim().toLowerCase()+"@wakuwaku.local";}
+function usernameEmail(u){return String(u||"").trim().toLowerCase()+"@wakuwaku.app";}
 function hasLocalData(){return !!(state.chars.length||state.savedParties.length);}
 function cloudSaveNow(){if(!cloudReady||!cloudUser||syncing)return;var payload=JSON.parse(JSON.stringify(state));supa.from("wakuwaku_data").upsert({user_id:cloudUser.id,data:payload,updated_at:new Date().toISOString()},{onConflict:"user_id"}).then(function(r){if(r.error)console.error(r.error);});}
 function scheduleCloudSave(){if(!cloudReady)return;clearTimeout(cloudTimer);cloudTimer=setTimeout(cloudSaveNow,700);}
