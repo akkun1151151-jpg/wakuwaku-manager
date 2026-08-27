@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>わくわく管理 v1.1.0</title>
+<title>わくわく管理 v1.1.1</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *{box-sizing:border-box}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Noto Sans JP",sans-serif;background:#f6f7fa;color:#20232a}
@@ -24,7 +24,7 @@ input,select{border:1px solid #dfe2e8;border-radius:10px;padding:10px 12px;backg
 </style>
 </head>
 <body>
-<header><div class="logo">⭐ わくわく管理 <span class="muted">v1.1.0</span></div><div class="nav"><button id="navChars" class="active">キャラ管理</button><button id="navParty">高難易度編成</button><button id="navSettings">設定</button></div></header>
+<header><div class="logo">⭐ わくわく管理 <span class="muted">v1.1.1</span></div><div class="nav"><button id="navChars" class="active">キャラ管理</button><button id="navParty">高難易度編成</button><button id="navSettings">設定</button></div></header>
 <main id="app"></main>
 <script>
 if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js").catch(function(e){console.warn("PWA service worker registration failed",e);});});}
