@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>わくわく管理 v0.6.0</title>
+<title>わくわく管理 v0.6.5</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *{box-sizing:border-box}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Noto Sans JP",sans-serif;background:#f6f7fa;color:#20232a}
@@ -18,13 +18,13 @@ input,select{border:1px solid #dfe2e8;border-radius:10px;padding:10px 12px;backg
 .waku-list{margin-top:6px;text-align:left}.waku-line{display:flex;align-items:center;gap:6px;font-size:12px;line-height:1.7;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-height:28px}.waku-line img{width:28px;height:28px;border-radius:6px;object-fit:cover;flex:none}.waku-line span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .modalback{position:fixed;inset:0;background:#0006;display:flex;align-items:center;justify-content:center;padding:16px;z-index:20}.modal{background:#fff;border-radius:16px;padding:18px;width:min(600px,100%);max-height:90vh;overflow:auto}
 .modalhead{display:flex;justify-content:space-between;align-items:center}.choices{display:flex;flex-wrap:wrap}.choice{border:1px solid #dfe2e8;background:#fff;border-radius:10px;padding:9px 12px;margin:4px;cursor:pointer}
-.presetgrid{display:grid;grid-template-columns:1fr 1fr;gap:7px}.waku{display:flex;justify-content:space-between;align-items:center;border:1px solid #e1e4ea;border-radius:9px;padding:9px;margin:5px 0}.waku-actions{display:flex;gap:5px;flex-wrap:wrap}.char-edit-list{display:flex;flex-direction:column;gap:8px;margin-top:10px}.photo-box{display:flex;gap:14px;align-items:center;border:1px solid #e1e4ea;border-radius:12px;padding:12px;margin:12px 0}.photo-preview{width:88px;height:88px;border-radius:14px;background:#eceef2;display:grid;place-items:center;overflow:hidden;font-size:28px}.photo-preview img{width:100%;height:100%;object-fit:cover}.char-edit-row{display:flex;align-items:center;justify-content:space-between;gap:10px;border:1px solid #e1e4ea;border-radius:10px;padding:9px 10px}.char-edit-left{display:flex;align-items:center;gap:10px;min-width:0}.char-edit-avatar{width:42px;height:42px;border-radius:10px;background:#eceef2;display:grid;place-items:center;overflow:hidden;flex:none}.char-edit-avatar img{width:100%;height:100%;object-fit:cover}.char-edit-info{min-width:0}.char-edit-name{font-weight:700}.char-edit-meta{font-size:12px;color:#737985;margin-top:2px}.party-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.party-slot{border:1px solid #e1e4ea;border-radius:12px;padding:12px;background:#fff}.party-slot.main{border:2px solid #5c5bd6}.party-slot select{width:100%;margin-top:7px}.party-avatar{width:64px;height:64px;border-radius:14px;background:#eceef2;overflow:hidden;display:grid;place-items:center;margin-bottom:8px}.party-avatar img{width:100%;height:100%;object-fit:cover}.party-waku{margin-top:8px}.party-waku-line{display:flex;align-items:center;gap:6px;font-size:12px;line-height:1.6}.party-waku-line img{width:24px;height:24px;border-radius:5px;object-fit:cover}.damage-card{background:#fff;border:1px solid #e1e4ea;border-radius:14px;padding:16px;margin-top:14px}.damage-total{font-size:26px;font-weight:800}.damage-row{display:flex;justify-content:space-between;border-bottom:1px solid #eee;padding:8px 0}.badge{display:inline-block;border-radius:999px;padding:3px 8px;font-size:11px;background:#f0f1f5;color:#555}.danger{border-color:#ffb5b5!important;color:#d33!important}.party-picker-list{max-height:360px;overflow:auto;border:1px solid #e1e4ea;border-radius:10px;margin-top:10px}.party-picker-item{display:flex;align-items:center;gap:10px;padding:9px;border-bottom:1px solid #eee;cursor:pointer}.party-picker-item:last-child{border-bottom:0}.party-picker-item:hover{background:#f7f8fa}.party-picker-avatar{width:42px;height:42px;border-radius:9px;background:#eceef2;overflow:hidden;display:grid;place-items:center;flex:none}.party-picker-avatar img{width:100%;height:100%;object-fit:cover}.party-picker-meta{font-size:11px;color:#777;margin-top:2px}.party-slot-actions{display:flex;gap:6px;margin-top:7px}.party-slot-actions .btn{flex:1}.party-register-bar{display:flex;gap:8px;align-items:center;margin-top:14px}.party-register-bar input{flex:1}.saved-party{border:1px solid #dfe3ea;border-radius:14px;background:#fff;padding:14px;margin-top:12px}.saved-party-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}.saved-party-title{font-weight:800;font-size:18px}.saved-party-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.saved-party-char{border:1px solid #e5e7eb;border-radius:12px;padding:10px;min-width:0}.saved-party-char-top{display:flex;gap:8px;align-items:center}.saved-party-char-avatar{width:48px;height:48px;border-radius:10px;background:#eceef2;overflow:hidden;display:grid;place-items:center;flex:none}.saved-party-char-avatar img{width:100%;height:100%;object-fit:cover}.saved-party-char-name{font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.saved-party-char-meta{font-size:11px;color:#777;margin-top:2px}.saved-party-waku{margin-top:9px}.saved-party-waku-line{display:flex;align-items:center;gap:5px;font-size:11px;line-height:1.5}.saved-party-waku-line img{width:22px;height:22px;border-radius:4px;object-fit:cover}.saved-party-damage{margin-top:10px;padding-top:9px;border-top:1px solid #eee;display:flex;align-items:baseline;justify-content:space-between}.saved-party-damage b{font-size:20px}.saved-party-empty{padding:18px;text-align:center;color:#777;border:1px dashed #d8dbe2;border-radius:12px}@media(max-width:900px){.saved-party-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.presetgrid{display:grid;grid-template-columns:1fr 1fr;gap:7px}.waku{display:flex;justify-content:space-between;align-items:center;border:1px solid #e1e4ea;border-radius:9px;padding:9px;margin:5px 0}.waku-actions{display:flex;gap:5px;flex-wrap:wrap}.char-edit-list{display:flex;flex-direction:column;gap:8px;margin-top:10px}.photo-box{display:flex;gap:14px;align-items:center;border:1px solid #e1e4ea;border-radius:12px;padding:12px;margin:12px 0}.photo-preview{width:88px;height:88px;border-radius:14px;background:#eceef2;display:grid;place-items:center;overflow:hidden;font-size:28px}.photo-preview img{width:100%;height:100%;object-fit:cover}.char-edit-row{display:flex;align-items:center;justify-content:space-between;gap:10px;border:1px solid #e1e4ea;border-radius:10px;padding:9px 10px}.char-edit-left{display:flex;align-items:center;gap:10px;min-width:0}.char-edit-avatar{width:42px;height:42px;border-radius:10px;background:#eceef2;display:grid;place-items:center;overflow:hidden;flex:none}.char-edit-avatar img{width:100%;height:100%;object-fit:cover}.char-edit-info{min-width:0}.char-edit-name{font-weight:700}.char-edit-meta{font-size:12px;color:#737985;margin-top:2px}.party-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.party-slot{border:1px solid #e1e4ea;border-radius:12px;padding:12px;background:#fff}.party-slot.main{border:2px solid #5c5bd6}.party-slot select{width:100%;margin-top:7px}.party-avatar{width:64px;height:64px;border-radius:14px;background:#eceef2;overflow:hidden;display:grid;place-items:center;margin-bottom:8px}.party-avatar img{width:100%;height:100%;object-fit:cover}.party-waku{margin-top:8px}.party-waku-line{display:flex;align-items:center;gap:6px;font-size:12px;line-height:1.6}.party-waku-line img{width:24px;height:24px;border-radius:5px;object-fit:cover}.damage-card{background:#fff;border:1px solid #e1e4ea;border-radius:14px;padding:16px;margin-top:14px}.damage-total{font-size:26px;font-weight:800}.damage-row{display:flex;justify-content:space-between;border-bottom:1px solid #eee;padding:8px 0}.badge{display:inline-block;border-radius:999px;padding:3px 8px;font-size:11px;background:#f0f1f5;color:#555}.danger{border-color:#ffb5b5!important;color:#d33!important}.party-picker-list{max-height:360px;overflow:auto;border:1px solid #e1e4ea;border-radius:10px;margin-top:10px}.party-picker-item{display:flex;align-items:center;gap:10px;padding:9px;border-bottom:1px solid #eee;cursor:pointer}.party-picker-item:last-child{border-bottom:0}.party-picker-item:hover{background:#f7f8fa}.party-picker-avatar{width:42px;height:42px;border-radius:9px;background:#eceef2;overflow:hidden;display:grid;place-items:center;flex:none}.party-picker-avatar img{width:100%;height:100%;object-fit:cover}.party-picker-meta{font-size:11px;color:#777;margin-top:2px}.party-slot-tabs{display:flex;gap:7px;flex-wrap:wrap;margin:14px 0 10px}.party-slot-tabs .btn{flex:1;min-width:120px}.inline-party-picker{border:1px solid #e1e4ea;border-radius:12px;padding:12px;background:#fafafd}.inline-picker-controls{display:grid;grid-template-columns:1fr 2fr;gap:10px}.inline-party-picker label{display:block;font-size:12px;font-weight:700;margin:0 0 5px}.party-picker-item.selected{background:#eef0ff;outline:2px solid #5c5bd6;outline-offset:-2px}.party-slot-actions{display:flex;gap:6px;margin-top:7px}.party-slot-actions .btn{flex:1}.party-register-bar{display:flex;gap:8px;align-items:center;margin-top:14px}.party-register-bar input{flex:1}.saved-party{border:1px solid #dfe3ea;border-radius:14px;background:#fff;padding:14px;margin-top:12px}.saved-party-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}.saved-party-title{font-weight:800;font-size:18px}.saved-party-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.saved-party-char{border:1px solid #e5e7eb;border-radius:12px;padding:10px;min-width:0}.saved-party-char-top{display:flex;gap:8px;align-items:center}.saved-party-char-avatar{width:48px;height:48px;border-radius:10px;background:#eceef2;overflow:hidden;display:grid;place-items:center;flex:none}.saved-party-char-avatar img{width:100%;height:100%;object-fit:cover}.saved-party-char-name{font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.saved-party-char-meta{font-size:11px;color:#777;margin-top:2px}.saved-party-waku{margin-top:9px}.saved-party-waku-line{display:flex;align-items:center;gap:5px;font-size:11px;line-height:1.5}.saved-party-waku-line img{width:22px;height:22px;border-radius:4px;object-fit:cover}.saved-party-damage{margin-top:10px;padding-top:9px;border-top:1px solid #eee;display:flex;align-items:baseline;justify-content:space-between}.saved-party-damage b{font-size:20px}.saved-party-empty{padding:18px;text-align:center;color:#777;border:1px dashed #d8dbe2;border-radius:12px}@media(max-width:900px){.saved-party-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.inline-picker-controls{grid-template-columns:1fr}.party-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:560px){.party-grid{grid-template-columns:1fr}.party-slot-tabs .btn{min-width:100%}}
 
 .auth-wrap{min-height:70vh;display:grid;place-items:center}.auth-card{width:min(430px,100%);background:#fff;border:1px solid #e1e4ea;border-radius:18px;padding:24px;box-shadow:0 10px 30px #0000000d}.auth-logo{font-weight:900;font-size:20px;margin-bottom:8px}.auth-card h1{font-size:24px;margin:8px 0}.auth-card label{display:block;font-size:13px;font-weight:700;margin:14px 0 6px}.auth-card input{width:100%}.auth-tabs{display:flex;gap:8px;margin:18px 0}.auth-tabs .btn{flex:1}.auth-msg{font-size:12px;margin-top:12px;color:#557}.auth-msg.error{color:#c33}.cloud-account{margin-bottom:14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}.cloud-account .muted{flex:1}
 </style>
 </head>
 <body>
-<header><div class="logo">⭐ わくわく管理 <span class="muted">v0.6.0</span></div><div class="nav"><button id="navChars" class="active">キャラ管理</button><button id="navParty">高難易度編成</button><button id="navSettings">設定</button></div></header>
+<header><div class="logo">⭐ わくわく管理 <span class="muted">v0.6.5</span></div><div class="nav"><button id="navChars" class="active">キャラ管理</button><button id="navParty">高難易度編成</button><button id="navSettings">設定</button></div></header>
 <main id="app"></main>
 <script>
 (function(){
@@ -33,6 +33,9 @@ input,select{border:1px solid #dfe2e8;border-radius:10px;padding:10px 12px;backg
 var state={accounts:["メイン","サブ1","サブ2","サブ3","サブ4"],chars:[],party:[{id:"",accountIndex:0},{id:"",accountIndex:0},{id:"",accountIndex:0},{id:"",accountIndex:0}],savedParties:[]};
 var filter={q:"",attr:"すべて",type:"すべて",form:"すべて",sort:"属性→名前"};
 var searchDraft="";
+var partyPickSlot=0,partySearchDrafts=["","","",""];
+var partyNameDraft="";
+var editingSavedPartyId="";
 var SUPABASE_URL="https://idvezmmaybviqivdcqdv.supabase.co";
 var SUPABASE_KEY="sb_publishable_wj1wG-EZeRwddutcvHlfPA_3ySqMX0c";
 var supa=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
@@ -420,38 +423,66 @@ function renderPartyWakuList(c,ai,compact){
  if(!ws.length)return '<div class="muted">未設定</div>';
  return ws.map(function(w){return '<div class="'+(compact?'saved-party-waku-line':'party-waku-line')+'"><img src="'+((w.grade||"L")==="EL"?EL_IMG:L_IMG)+'" alt=""><span>'+esc(w.name)+(w.grade||"L")+'</span></div>';}).join('');
 }
-function openPartyPicker(slotIndex){
- var slot=state.party[slotIndex]||{id:"",accountIndex:0};
- var overlay=document.createElement("div");overlay.className="modal-overlay";
- overlay.innerHTML='<div class="modal" style="max-width:650px"><div class="modal-head"><b>キャラを選択</b><button class="btn" id="closePartyPicker">閉じる</button></div><div class="card" style="margin:0;padding:0;border:0;box-shadow:none"><label>参照アカウント</label><select id="partyAccount" class="wide">'+state.accounts.map(function(a,i){return '<option value="'+i+'" '+(i===slot.accountIndex?'selected':'')+'>'+esc(a)+'</option>';}).join('')+'</select><label style="display:block;margin-top:10px">キャラ検索</label><input id="partySearch" class="wide" placeholder="キャラ名・よみがなで検索"><div id="partyPickerList" class="party-picker-list"></div></div></div>';
- document.body.appendChild(overlay);
- var accountSel=overlay.querySelector('#partyAccount'),search=overlay.querySelector('#partySearch'),list=overlay.querySelector('#partyPickerList');
- function drawList(){
-  var normalized=normalizeSearch((search.value||'').trim()),ai=parseInt(accountSel.value,10)||0;
-  var arr=state.chars.filter(function(c){
-   if(c.owned&&c.owned[ai]===false)return false;
-   return !normalized||normalizeSearch(c.name).indexOf(normalized)>=0||normalizeSearch(c.kana).indexOf(normalized)>=0;
-  });
-  list.innerHTML=arr.length?arr.map(function(c){return '<div class="party-picker-item" data-pick-party="'+esc(c.id)+'"><div class="party-picker-avatar">'+(c.image?'<img src="'+c.image+'" alt="">':'⭐')+'</div><div style="min-width:0"><b>'+esc(c.name)+'</b><div class="party-picker-meta">'+esc(c.kana||'')+' / '+esc(c.attr||'')+' / '+esc(c.race||'種族未設定')+' / '+esc(c.battleType||'')+' / '+esc(c.shotType||'')+'</div></div></div>';}).join(''):'<div class="muted" style="padding:14px">該当するキャラがありません</div>';
-  list.querySelectorAll('[data-pick-party]').forEach(function(item){item.onclick=function(){state.party[slotIndex]={id:item.getAttribute('data-pick-party'),accountIndex:parseInt(accountSel.value,10)||0};save();overlay.remove();renderParty();};});
- }
- accountSel.onchange=drawList;search.oninput=function(){};search.onkeydown=function(e){if(e.key==='Enter'){e.preventDefault();drawList();}};overlay.querySelector('#closePartyPicker').onclick=function(){overlay.remove();};overlay.onclick=function(e){if(e.target===overlay)overlay.remove();};drawList();search.focus();
+function drawInlinePartyPicker(){
+ var slot=state.party[partyPickSlot]||{id:"",accountIndex:0};
+ var accountSel=document.getElementById('inlinePartyAccount'),search=document.getElementById('inlinePartySearch'),list=document.getElementById('inlinePartyPickerList');
+ if(!accountSel||!search||!list)return;
+ var ai=parseInt(accountSel.value,10)||0;
+ partySearchDrafts[partyPickSlot]=search.value||partySearchDrafts[partyPickSlot]||"";
+ var normalized=normalizeSearch((partySearchDrafts[partyPickSlot]||"").trim());
+ var arr=state.chars.filter(function(c){
+  if(c.owned&&c.owned[ai]===false)return false;
+  return !normalized||normalizeSearch(c.name).indexOf(normalized)>=0||normalizeSearch(c.kana).indexOf(normalized)>=0;
+ });
+ list.innerHTML=arr.length?arr.map(function(c){
+  var selected=String(c.id)===String(slot.id);
+  return '<div class="party-picker-item '+(selected?'selected':'')+'" data-inline-pick-party="'+esc(c.id)+'"><div class="party-picker-avatar">'+(c.image?'<img src="'+c.image+'" alt="">':'⭐')+'</div><div style="min-width:0"><b>'+esc(c.name)+'</b><div class="party-picker-meta">'+esc(c.kana||'')+' / '+esc(c.attr||'')+' / '+esc(c.race||'種族未設定')+' / '+esc(c.battleType||'')+' / '+esc(c.shotType||'')+'</div></div></div>';
+ }).join(''):'<div class="muted" style="padding:14px">該当するキャラがありません</div>';
+ list.querySelectorAll('[data-inline-pick-party]').forEach(function(item){item.onclick=function(){state.party[partyPickSlot]={id:item.getAttribute('data-inline-pick-party'),accountIndex:parseInt(accountSel.value,10)||0};save();renderParty();};});
 }
 function registerCurrentParty(){
  var nameInput=document.getElementById('partyNameInput');
- var name=(nameInput&&nameInput.value||'').trim();
+ var name=(nameInput&&nameInput.value||partyNameDraft||'').trim();
  if(!name){alert('「〇〇用」など、編成名を入力してください。');if(nameInput)nameInput.focus();return;}
  var filled=state.party.filter(function(x){return x&&x.id;}).length;
  if(filled<4){alert('4キャラを選択してから登録してください。');return;}
- state.savedParties.push({id:'party_'+Date.now()+'_'+Math.random().toString(36).slice(2),name:name,slots:state.party.map(function(x){return {id:x.id,accountIndex:x.accountIndex||0};})});
- save();nameInput.value='';renderParty();
+ var slots=state.party.map(function(x){return {id:x.id,accountIndex:x.accountIndex||0};});
+ if(editingSavedPartyId){
+  var target=state.savedParties.find(function(p){return String(p.id)===String(editingSavedPartyId);});
+  if(target){target.name=name;target.slots=slots;}
+  editingSavedPartyId='';
+ }else{
+  state.savedParties.push({id:'party_'+Date.now()+'_'+Math.random().toString(36).slice(2),name:name,slots:slots});
+ }
+ partyNameDraft='';
+ save();renderParty();
+}
+function editSavedParty(id){
+ var p=state.savedParties.find(function(x){return String(x.id)===String(id);});
+ if(!p)return;
+ editingSavedPartyId=String(p.id);
+ partyNameDraft=String(p.name||'');
+ state.party=p.slots.slice(0,4).map(function(x){return {id:x&&x.id?String(x.id):'',accountIndex:Math.max(0,Math.min(state.accounts.length-1,parseInt(x&&x.accountIndex,10)||0))};});
+ while(state.party.length<4)state.party.push({id:'',accountIndex:0});
+ partyPickSlot=0;
+ partySearchDrafts=['','','',''];
+ save();
+ renderParty();
+ setTimeout(function(){var el=document.getElementById('partyNameInput');if(el){el.focus();el.scrollIntoView({behavior:'smooth',block:'center'});}},50);
+}
+function cancelEditSavedParty(){
+ editingSavedPartyId='';
+ partyNameDraft='';
+ partySearchDrafts=['','','',''];
+ renderParty();
 }
 function deleteSavedParty(id){
  if(!confirm('この高難易度編成を削除しますか？'))return;
- state.savedParties=state.savedParties.filter(function(p){return String(p.id)!==String(id);});save();renderParty();
+ state.savedParties=state.savedParties.filter(function(p){return String(p.id)!==String(id);});
+ if(String(editingSavedPartyId)===String(id))cancelEditSavedParty();else{save();renderParty();}
 }
 function renderSavedParty(p){
- var h='<div class="saved-party"><div class="saved-party-head"><div><div class="saved-party-title">'+esc(p.name)+'</div><div class="muted" style="font-size:12px">登録済み高難易度編成</div></div><button class="btn danger" data-delete-saved-party="'+esc(p.id)+'">削除</button></div><div class="saved-party-grid">';
+ var h='<div class="saved-party"><div class="saved-party-head"><div><div class="saved-party-title">'+esc(p.name)+'</div><div class="muted" style="font-size:12px">登録済み高難易度編成</div></div><div style="display:flex;gap:6px;flex-wrap:wrap"><button class="btn" data-edit-saved-party="'+esc(p.id)+'">編集</button><button class="btn danger" data-delete-saved-party="'+esc(p.id)+'">削除</button></div></div><div class="saved-party-grid">';
  p.slots.slice(0,4).forEach(function(slot,i){
   var ai=Math.max(0,Math.min(state.accounts.length-1,parseInt(slot.accountIndex,10)||0));
   var c=state.chars.find(function(x){return String(x.id)===String(slot.id);});
@@ -464,26 +495,41 @@ function renderSavedParty(p){
 }
 function renderParty(){
  var chars=state.chars;
- var h='<div class="title">高難易度パーティー編成</div><div class="card"><b>4キャラを選択</b><p class="muted">各枠で参照するアカウントを選び、そのアカウントに設定したわくわくの実を表示します。1体目がメインキャラです。</p><div class="party-grid">';
+ var activeSlot=Math.max(0,Math.min(3,partyPickSlot)); partyPickSlot=activeSlot;
+ var active=state.party[activeSlot]||{id:"",accountIndex:0};
+ var activeAi=Math.max(0,Math.min(state.accounts.length-1,parseInt(active.accountIndex,10)||0));
+ var h='<div class="title">高難易度パーティー編成</div>';
+ h+='<div class="card"><div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap"><div><b style="font-size:18px">キャラを選択</b><p class="muted" style="margin:5px 0 0">4枠それぞれで参照するアカウントを選び、キャラを一覧から選択できます。</p></div><span class="badge">選択中：'+(activeSlot===0?'メイン':'メンバー'+activeSlot)+'</span></div>';
+ h+='<div class="party-slot-tabs">';
+ for(var t=0;t<4;t++){
+  var tc=state.party[t]&&state.party[t].id?chars.find(function(x){return String(x.id)===String(state.party[t].id);}):null;
+  h+='<button class="btn '+(t===activeSlot?'primary':'')+'" data-party-slot="'+t+'">'+(t===0?'メイン':'メンバー'+t)+(tc?'：'+esc(tc.name):'')+'</button>';
+ }
+ h+='</div>';
+ h+='<div class="inline-party-picker"><div class="inline-picker-controls"><div><label>参照アカウント</label><select id="inlinePartyAccount" class="wide">'+state.accounts.map(function(a,i){return '<option value="'+i+'" '+(i===activeAi?'selected':'')+'>'+esc(a)+'</option>';}).join('')+'</select></div><div><label>キャラ検索</label><input id="inlinePartySearch" class="wide" placeholder="キャラ名・よみがなで検索（Enterで検索）" value="'+esc(partySearchDrafts[activeSlot]||'')+'"></div></div>';
+ h+='<div id="inlinePartyPickerList" class="party-picker-list"></div></div></div>';
+ h+='<div class="card" style="margin-top:14px"><b>現在のパーティー</b><p class="muted">選択した4キャラのわくわくの実と、この編成で各キャラに反映される加撃量を確認できます。変更は上の「キャラを選択」から行えます。</p><div class="party-grid">';
  for(var i=0;i<4;i++){
   var slot=state.party[i]||{id:"",accountIndex:0},ai=Math.max(0,Math.min(state.accounts.length-1,parseInt(slot.accountIndex,10)||0));
   var c=chars.find(function(x){return String(x.id)===String(slot.id);});
-  h+='<div class="party-slot '+(i===0?'main':'')+'"><span class="badge">'+(i===0?'メイン':'メンバー'+i)+'</span><div class="party-avatar">'+(c&&c.image?'<img src="'+c.image+'" alt="">':'⭐')+'</div><div class="muted" style="font-size:12px">参照アカウント</div><select class="wide" data-party-account="'+i+'">'+state.accounts.map(function(a,j){return '<option value="'+j+'" '+(j===ai?'selected':'')+'>'+esc(a)+'</option>';}).join('')+'</select><div class="party-slot-actions"><button class="btn primary" data-party-pick="'+i+'">'+(c?'キャラを変更':'キャラを選択')+'</button>'+(c?'<button class="btn" data-party-clear="'+i+'">クリア</button>':'')+'</div>';
-  if(c){h+='<div style="margin-top:8px"><b>'+esc(c.name)+'</b></div><div class="party-waku"><b>わくわくの実（'+esc(state.accounts[ai])+'）</b>'+renderPartyWakuList(c,ai,false)+'</div>';}
+  h+='<div class="party-slot '+(i===0?'main':'')+'"><span class="badge">'+(i===0?'メイン':'メンバー'+i)+'</span><div class="party-avatar">'+(c&&c.image?'<img src="'+c.image+'" alt="">':'⭐')+'</div><div class="muted" style="font-size:12px">参照アカウント</div><div style="margin-top:7px">'+esc(state.accounts[ai])+'</div>';
+  if(c){h+='<div style="margin-top:8px"><b>'+esc(c.name)+'</b></div><div class="party-waku"><b>わくわくの実</b>'+renderPartyWakuList(c,ai,false)+'</div>';}else{h+='<div class="muted" style="margin-top:8px">未選択</div>';}
   h+='</div>';
  }
- h+='</div><div class="party-register-bar"><input id="partyNameInput" class="wide" placeholder="〇〇用（例：天魔1の間用）"><button class="btn primary" id="registerPartyBtn">登録</button></div></div>';
- h+='<div class="title" style="margin-top:24px">キャラを選択</div>';
- h+='<div class="card" style="padding:12px 14px"><span class="muted">4体のキャラを選択すると、登録済みの編成に保存できます。</span></div>';
- h+='<div class="title" style="margin-top:18px">登録済みの高難易度編成</div>';
+ h+='</div><div class="party-register-bar"><input id="partyNameInput" class="wide" placeholder="〇〇用（例：天魔1の間用）" value="'+esc(partyNameDraft)+'"><button class="btn primary" id="registerPartyBtn">'+(editingSavedPartyId?'変更を保存':'登録')+'</button>'+(editingSavedPartyId?'<button class="btn" id="cancelPartyEditBtn">編集をキャンセル</button>':'')+'</div></div>';
+ h+='<div class="title" style="margin-top:24px">登録済みの高難易度編成</div>';
  if(state.savedParties.length)state.savedParties.slice().reverse().forEach(function(p){h+=renderSavedParty(p);});else h+='<div class="saved-party-empty">まだ登録された編成はありません。編成を作って「登録」を押してください。</div>';
  if(!chars.length)h+='<div class="card"><b>キャラが登録されていません</b><p class="muted">設定 → キャラを追加から登録してください。</p></div>';
  document.getElementById("app").innerHTML=h;
- document.querySelectorAll('[data-party-account]').forEach(function(sel){sel.onchange=function(){var i=parseInt(this.getAttribute('data-party-account'),10);state.party[i].accountIndex=parseInt(this.value,10)||0;save();renderParty();};});
- document.querySelectorAll('[data-party-pick]').forEach(function(btn){btn.onclick=function(){openPartyPicker(parseInt(this.getAttribute('data-party-pick'),10));};});
- document.querySelectorAll('[data-party-clear]').forEach(function(btn){btn.onclick=function(){var i=parseInt(this.getAttribute('data-party-clear'),10);state.party[i]={id:"",accountIndex:state.party[i].accountIndex||0};save();renderParty();};});
+ document.querySelectorAll('[data-party-slot]').forEach(function(btn){btn.onclick=function(){partyPickSlot=parseInt(this.getAttribute('data-party-slot'),10)||0;renderParty();};});
+ document.getElementById('inlinePartyAccount').onchange=function(){state.party[partyPickSlot].accountIndex=parseInt(this.value,10)||0;save();renderParty();};
+ var ps=document.getElementById('inlinePartySearch'); ps.oninput=function(){partySearchDrafts[partyPickSlot]=this.value;}; ps.onkeydown=function(e){if(e.key==='Enter'&&!e.isComposing){e.preventDefault();partySearchDrafts[partyPickSlot]=this.value;drawInlinePartyPicker();}};
+ document.getElementById('partyNameInput').oninput=function(){partyNameDraft=this.value;};
  document.getElementById('registerPartyBtn').onclick=registerCurrentParty;
+ var cancelBtn=document.getElementById('cancelPartyEditBtn');if(cancelBtn)cancelBtn.onclick=cancelEditSavedParty;
+ document.querySelectorAll('[data-edit-saved-party]').forEach(function(btn){btn.onclick=function(){editSavedParty(this.getAttribute('data-edit-saved-party'));};});
  document.querySelectorAll('[data-delete-saved-party]').forEach(function(btn){btn.onclick=function(){deleteSavedParty(this.getAttribute('data-delete-saved-party'));};});
+ drawInlinePartyPicker();
 }
 document.getElementById("navChars").onclick=function(){document.getElementById("navChars").classList.add("active");document.getElementById("navParty").classList.remove("active");document.getElementById("navSettings").classList.remove("active");renderChars();};
 document.getElementById("navParty").onclick=function(){document.getElementById("navParty").classList.add("active");document.getElementById("navChars").classList.remove("active");document.getElementById("navSettings").classList.remove("active");renderParty();};
