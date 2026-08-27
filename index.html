@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>わくわく管理 v1.0.0</title>
+<title>わくわく管理 v1.1.0</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *{box-sizing:border-box}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Noto Sans JP",sans-serif;background:#f6f7fa;color:#20232a}
@@ -24,9 +24,10 @@ input,select{border:1px solid #dfe2e8;border-radius:10px;padding:10px 12px;backg
 </style>
 </head>
 <body>
-<header><div class="logo">⭐ わくわく管理 <span class="muted">v1.0.0</span></div><div class="nav"><button id="navChars" class="active">キャラ管理</button><button id="navParty">高難易度編成</button><button id="navSettings">設定</button></div></header>
+<header><div class="logo">⭐ わくわく管理 <span class="muted">v1.1.0</span></div><div class="nav"><button id="navChars" class="active">キャラ管理</button><button id="navParty">高難易度編成</button><button id="navSettings">設定</button></div></header>
 <main id="app"></main>
 <script>
+if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js").catch(function(e){console.warn("PWA service worker registration failed",e);});});}
 (function(){
 "use strict";
 
@@ -39,10 +40,13 @@ var editingSavedPartyId="";
 var SUPABASE_URL="https://idvezmmaybviqivdcqdv.supabase.co";
 var SUPABASE_KEY="sb_publishable_wj1wG-EZeRwddutcvHlfPA_3ySqMX0c";
 var supa=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
-var cloudReady=false, cloudUser=null, cloudTimer=null, syncing=false;
+var cloudReady=false, cloudUser=null, cloudTimer=null, syncing=false, sharedChars=[];
 function usernameEmail(u){return String(u||"").trim().toLowerCase()+"@wakuwaku.app";}
 function hasLocalData(){return !!(state.chars.length||state.savedParties.length);}
 function cloudSaveNow(){if(!cloudReady||!cloudUser||syncing)return;var payload=JSON.parse(JSON.stringify(state));supa.from("wakuwaku_data").upsert({user_id:cloudUser.id,data:payload,updated_at:new Date().toISOString()},{onConflict:"user_id"}).then(function(r){if(r.error)console.error(r.error);});}
+function applySharedImages(){state.chars.forEach(function(c){var hit=sharedChars.find(function(x){return normalizeSearch(x.name)===normalizeSearch(c.name)&&x.image;});if(hit)c.image=hit.image;});}
+function syncSharedCharacter(c){if(!cloudReady||!cloudUser||!c||!c.name||!c.image)return Promise.resolve();return supa.from("wakuwaku_shared_characters").upsert({name:c.name,image:c.image,updated_by:cloudUser.id,updated_at:new Date().toISOString()},{onConflict:"name"}).then(function(r){if(r.error)console.error(r.error);else{var hit=sharedChars.find(function(x){return x.name===c.name;});if(hit){hit.image=c.image;}else sharedChars.push({name:c.name,image:c.image});}});}
+function loadSharedCharacters(){return supa.from("wakuwaku_shared_characters").select("name,image").then(function(r){if(r.error){console.error(r.error);return;}sharedChars=r.data||[];applySharedImages();});}
 function scheduleCloudSave(){if(!cloudReady)return;clearTimeout(cloudTimer);cloudTimer=setTimeout(cloudSaveNow,700);}
 
 var RACES=["神","魔王","魔族","亜人","聖騎士","サムライ","ロボット","妖精","獣","鳥","幻獣","ドラゴン","ユニバース","コスモ","鉱物","幻妖"];
@@ -115,12 +119,16 @@ function showAuth(){
  document.getElementById('authSubmit').onclick=function(){var u=(document.getElementById('authUser').value||'').trim();var pw=document.getElementById('authPass').value||'';if(!/^[A-Za-z0-9_\-\.]{3,32}$/.test(u)){msg('IDは3～32文字の半角英数字・_・-・.で入力してください。',true);return;}if(pw.length<6){msg('パスワードは6文字以上にしてください。',true);return;}var email=usernameEmail(u);var req=signup?supa.auth.signUp({email:email,password:pw,options:{data:{username:u}}}):supa.auth.signInWithPassword({email:email,password:pw});req.then(function(res){if(res.error){msg(res.error.message||'認証に失敗しました。',true);return;}if(signup&&!res.data.session){msg('アカウントを作成しました。Supabaseのメール確認設定が有効な場合は、メール確認を無効にするか確認してください。',true);return;} if(res.data.session){cloudUser=res.data.user;startCloudSync();}});};
 }
 function startCloudSync(){
- supa.from('wakuwaku_data').select('data').eq('user_id',cloudUser.id).maybeSingle().then(function(r){
+ Promise.all([
+  supa.from('wakuwaku_data').select('data').eq('user_id',cloudUser.id).maybeSingle(),
+  supa.from('wakuwaku_shared_characters').select('name,image')
+ ]).then(function(results){
+  var r=results[0], sr=results[1];
+  if(sr.error){console.error(sr.error);sharedChars=[];}else{sharedChars=sr.data||[];}
   if(r.error){console.error(r.error);alert('クラウドデータの取得に失敗しました。Supabaseのテーブル/RLS設定を確認してください。');return;}
-  if(r.data&&r.data.data){syncing=true;state=r.data.data;syncing=false;normalizeState();cloudReady=true;renderChars();}
-  else {cloudReady=true;if(hasLocalData()&&confirm('この端末に保存されている既存データをクラウドへ移行しますか？'))cloudSaveNow();renderChars();}
-  }
- );
+  if(r.data&&r.data.data){syncing=true;state=r.data.data;syncing=false;normalizeState();applySharedImages();cloudReady=true;renderChars();}
+  else {cloudReady=true;applySharedImages();if(hasLocalData()&&confirm('この端末に保存されている既存データをクラウドへ移行しますか？'))cloudSaveNow();renderChars();}
+ });
 }
 function logout(){supa.auth.signOut().then(function(){cloudReady=false;cloudUser=null;showAuth();});}
 function renderChars(){
@@ -254,7 +262,7 @@ function openCharEditor(editId){
  var nameValue=editing?editing.name:"",kanaValue=editing?editing.kana||"":"",imageValue=editing?editing.image||"":"";
  function draw(){
   modal.innerHTML='<div class="modalhead"><h2>'+(editing?'キャラを編集':'キャラを追加')+'</h2><button id="cancelChar" class="btn">閉じる</button></div>'+ 
-   '<div class="photo-box"><div id="charPreview" class="photo-preview">'+(imageValue?'<img src="'+imageValue+'" alt="">':'⭐')+'</div><div><b>キャラ画像</b><p class="muted">一覧表のキャラ欄に表示されます。</p><input id="charImage" type="file" accept="image/*" style="display:none"><button id="addPhoto" type="button" class="btn">写真を追加</button> '+(imageValue?'<button id="removePhoto" type="button" class="btn">画像を削除</button>':'')+'<p class="muted">JPG / PNGなど・自動で小さくして保存します</p></div></div>'+ 
+   '<div class="photo-box"><div id="charPreview" class="photo-preview">'+(imageValue?'<img src="'+imageValue+'" alt="">':'⭐')+'</div><div><b>キャラ画像</b><p class="muted">一覧表のキャラ欄に表示されます。アップロードした画像はキャラ名と紐づけてクラウド共有されます。</p><input id="charImage" type="file" accept="image/*" style="display:none"><button id="addPhoto" type="button" class="btn">写真を追加</button> '+(imageValue?'<button id="removePhoto" type="button" class="btn">画像を削除</button>':'')+'<p class="muted">JPG / PNGなど・自動で小さくして保存します</p></div></div>'+ 
    '<label>キャラ名<input id="charName" class="wide" style="margin-top:5px" placeholder="例：新キャラ" value="'+esc(nameValue)+'"></label>'+ 
    '<label style="display:block;margin-top:10px">よみがな（ひらがな）<input id="charKana" class="wide" style="margin-top:5px" placeholder="例：しんきゃら" value="'+esc(kanaValue)+'"></label>'+ 
    '<h3>属性</h3><div class="choices">'+["火","水","木","光","闇"].map(function(x){return '<button type="button" class="choice '+(selected.attr===x?'selected':'')+'" data-attr="'+x+'">'+x+'</button>';}).join("")+ '</div>'+ 
@@ -304,7 +312,10 @@ function openCharEditor(editId){
    }else{
     state.chars.push({id:String(Date.now())+Math.random(),name:nameValue,kana:kanaValue,image:imageValue,attr:selected.attr,type:selected.type,form:selected.form,race:selected.race,battleType:selected.battleType,shotType:selected.shotType,owned:state.accounts.map(function(){return true;}),waku:state.accounts.map(function(){return [];})});
    }
-   save();overlay.remove();renderSettings();
+   save();
+   if(imageValue)syncSharedCharacter(editing||state.chars[state.chars.length-1]);
+   applySharedImages();
+   overlay.remove();renderSettings();
   };
   if(editing){
    modal.querySelector("#deleteChar").onclick=function(){
