@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>わくわく管理 v1.2.5</title>
+<title>わくわく管理 v1.2.6</title>
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png">
 <link rel="apple-touch-icon" sizes="180x180" href="./icons/icon-180.png">
@@ -27,7 +27,7 @@ input,select{border:1px solid #dfe2e8;border-radius:10px;padding:10px 12px;backg
 </style>
 </head>
 <body>
-<header><div class="logo">⭐ わくわく管理 <span class="muted">v1.2.5</span></div><div class="nav"><button id="navChars" class="active">キャラ管理</button><button id="navParty">高難易度編成</button><button id="navSettings">設定</button></div></header>
+<header><div class="logo">⭐ わくわく管理 <span class="muted">v1.2.6</span></div><div class="nav"><button id="navChars" class="active">キャラ管理</button><button id="navParty">高難易度編成</button><button id="navSettings">設定</button></div></header>
 <main id="app"></main>
 <script>
 if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js").catch(function(e){console.warn("PWA service worker registration failed",e);});});}
@@ -174,7 +174,7 @@ function renderChars(){
   if(filter.sort==="進化形態→名前") return a.form.localeCompare(b.form,"ja")||a.name.localeCompare(b.name,"ja");
   return order[a.attr]-order[b.attr]||a.name.localeCompare(b.name,"ja");
  });
- var h='<div class="title">キャラ管理</div><div class="toolbar"><input id="search" class="search" placeholder="キャラ名で検索" value="'+esc(searchDraft)+'"><button id="searchBtn" class="btn primary">検索</button><select id="attr"><option>すべて</option><option>火</option><option>水</option><option>木</option><option>光</option><option>闇</option></select><select id="type"><option>すべて</option><option>恒常</option><option>限定</option><option>コラボ</option></select><select id="form"><option>すべて</option><option>獣神化</option><option>獣神化・改</option><option>真獣神化</option></select><select id="sort"><option>属性→名前</option><option>名前順</option><option>分類→名前</option><option>進化形態→名前</option></select></div>';
+ var h='<div class="title">キャラ管理</div><div class="toolbar"><input id="search" class="search" placeholder="キャラ名で検索" value="'+esc(searchDraft)+'"><button id="searchBtn" class="btn primary">検索</button><select id="attr"><option>すべて</option><option>火</option><option>水</option><option>木</option><option>光</option><option>闇</option></select><select id="type"><option>すべて</option><option>恒常</option><option>限定</option><option>コラボ</option></select><select id="form"><option>すべて</option><option>獣神化</option><option>獣神化・改</option><option>真獣神化</option></select><select id="sort"><option>属性→名前</option><option>名前順</option><option>分類→名前</option><option>進化形態→名前</option></select><button id="charListReset" class="btn">リセット</button></div>';
  if(list.length===0){
   h+='<div class="card"><b>キャラが登録されていません</b><p class="muted">設定 → キャラを追加から登録できます。</p></div>';
  }else{
@@ -213,6 +213,7 @@ function renderChars(){
  document.getElementById("type").onchange=function(){filter.type=this.value;renderChars();};
  document.getElementById("form").onchange=function(){filter.form=this.value;renderChars();};
  document.getElementById("sort").onchange=function(){filter.sort=this.value;renderChars();};
+ document.getElementById("charListReset").onclick=function(){filter={q:"",attr:"すべて",type:"すべて",form:"すべて",sort:"属性→名前"};searchDraft="";renderChars();};
  document.querySelectorAll("[data-toggle-id]").forEach(function(btn){
   btn.onclick=function(){
    var c=state.chars.find(function(x){return String(x.id)===String(btn.getAttribute("data-toggle-id"));});
@@ -609,7 +610,7 @@ function renderParty(){
  if(!chars.length)h+='<div class="card"><b>キャラが登録されていません</b><p class="muted">設定 → キャラを追加から登録してください。</p></div>';
  document.getElementById("app").innerHTML=h;
  document.querySelectorAll('[data-party-slot]').forEach(function(btn){btn.onclick=function(){partyPickSlot=parseInt(this.getAttribute('data-party-slot'),10)||0;renderParty();};});
- var pa=document.getElementById('partyPickerAttr'),pt=document.getElementById('partyPickerType'),psh=document.getElementById('partyPickerShot');if(pa){pa.value=partyPickerAttr;pa.onchange=function(){partyPickerAttr=this.value;drawInlinePartyPicker();};}if(pt){pt.value=partyPickerType;pt.onchange=function(){partyPickerType=this.value;drawInlinePartyPicker();};}if(psh){psh.value=partyPickerShot;psh.onchange=function(){partyPickerShot=this.value;drawInlinePartyPicker();};}var rb=document.getElementById('resetPartyPickerFilters');if(rb)rb.onclick=function(){partyPickerAttr='すべて';partyPickerType='すべて';partyPickerShot='すべて';renderParty();};
+ var pa=document.getElementById('partyPickerAttr'),pt=document.getElementById('partyPickerType'),psh=document.getElementById('partyPickerShot');if(pa){pa.value=partyPickerAttr;pa.onchange=function(){partyPickerAttr=this.value;drawInlinePartyPicker();};}if(pt){pt.value=partyPickerType;pt.onchange=function(){partyPickerType=this.value;drawInlinePartyPicker();};}if(psh){psh.value=partyPickerShot;psh.onchange=function(){partyPickerShot=this.value;drawInlinePartyPicker();};}var rb=document.getElementById('resetPartyPickerFilters');if(rb)rb.onclick=function(){partyPickerAttr='すべて';partyPickerType='すべて';partyPickerShot='すべて';partySearchDrafts[activeSlot]='';renderParty();};
  var pg=document.getElementById('partyGroupSelect');if(pg)pg.onchange=function(){partyGroupDraft=this.value;};var cg=document.getElementById('createPartyGroupBtn');if(cg)cg.onclick=createPartyGroup;var cgt=document.getElementById('createPartyGroupTopBtn');if(cgt)cgt.onclick=createPartyGroup;var gf=document.getElementById('partyGroupFilter');if(gf)gf.onchange=function(){partyGroupFilter=this.value;renderParty();};var pgi=document.getElementById('partyGroupInput');if(pgi)pgi.oninput=function(){partyGroupDraft=this.value;};
  var gs=document.getElementById('guardianSelect');if(gs)gs.onchange=function(){state.guardianId=this.value;save();renderParty();};var ga=document.getElementById('addGuardianBtn');if(ga)ga.onclick=addGuardian;var gi=document.getElementById('guardianImageInput2');if(gi)gi.onchange=function(){updateGuardianImage(this.files&&this.files[0]);};var gc=document.getElementById('clearGuardianBtn');if(gc)gc.onclick=clearGuardian;var chg=document.getElementById('changeGuardianBtn');if(chg)chg.onclick=function(){var el=document.getElementById('guardianSelect');if(el){el.focus();el.scrollIntoView({behavior:'smooth',block:'center'});}};
  document.getElementById('inlinePartyAccount').onchange=function(){state.party[partyPickSlot].accountIndex=parseInt(this.value,10)||0;save();renderParty();};
