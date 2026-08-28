@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>わくわく管理 v1.2.6</title>
+<title>わくわく管理 v1.2.9</title>
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png">
 <link rel="apple-touch-icon" sizes="180x180" href="./icons/icon-180.png">
@@ -27,7 +27,7 @@ input,select{border:1px solid #dfe2e8;border-radius:10px;padding:10px 12px;backg
 </style>
 </head>
 <body>
-<header><div class="logo">⭐ わくわく管理 <span class="muted">v1.2.6</span></div><div class="nav"><button id="navChars" class="active">キャラ管理</button><button id="navParty">高難易度編成</button><button id="navSettings">設定</button></div></header>
+<header><div class="logo">⭐ わくわく管理 <span class="muted">v1.2.9</span></div><div class="nav"><button id="navChars" class="active">キャラ管理</button><button id="navParty">高難易度編成</button><button id="navSettings">設定</button></div></header>
 <main id="app"></main>
 <script>
 if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js").catch(function(e){console.warn("PWA service worker registration failed",e);});});}
@@ -103,10 +103,16 @@ function normalize(){
   if(typeof c.shotType!=="string")c.shotType="反射";
   if(!Array.isArray(c.owned))c.owned=state.accounts.map(function(){return true;});
   if(!Array.isArray(c.waku))c.waku=state.accounts.map(function(){return [];});
+  if(!Array.isArray(c.hasSecond))c.hasSecond=state.accounts.map(function(){return false;});
+  if(!Array.isArray(c.waku2))c.waku2=state.accounts.map(function(){return [];});
   while(c.owned.length<state.accounts.length)c.owned.push(true);
   while(c.waku.length<state.accounts.length)c.waku.push([]);
+  while(c.hasSecond.length<state.accounts.length)c.hasSecond.push(false);
+  while(c.waku2.length<state.accounts.length)c.waku2.push([]);
   c.owned=c.owned.slice(0,state.accounts.length);
   c.waku=c.waku.slice(0,state.accounts.length);
+  c.hasSecond=c.hasSecond.slice(0,state.accounts.length);
+  c.waku2=c.waku2.slice(0,state.accounts.length);
  });
 }
 function normalizeState(){
@@ -117,7 +123,7 @@ function normalizeState(){
   if(!Array.isArray(state.partyGroups))state.partyGroups=[];
   if(!Array.isArray(state.guardians))state.guardians=[];
   if(typeof state.guardianId!=="string")state.guardianId="";
-  state.chars.forEach(function(c){if(!Array.isArray(c.owned))c.owned=state.accounts.map(function(){return true;});if(!Array.isArray(c.waku))c.waku=state.accounts.map(function(){return [];});while(c.owned.length<state.accounts.length)c.owned.push(true);while(c.waku.length<state.accounts.length)c.waku.push([]);c.owned=c.owned.slice(0,state.accounts.length);c.waku=c.waku.slice(0,state.accounts.length);});
+  state.chars.forEach(function(c){if(!Array.isArray(c.owned))c.owned=state.accounts.map(function(){return true;});if(!Array.isArray(c.waku))c.waku=state.accounts.map(function(){return [];});if(!Array.isArray(c.hasSecond))c.hasSecond=state.accounts.map(function(){return false;});if(!Array.isArray(c.waku2))c.waku2=state.accounts.map(function(){return [];});while(c.owned.length<state.accounts.length)c.owned.push(true);while(c.waku.length<state.accounts.length)c.waku.push([]);while(c.hasSecond.length<state.accounts.length)c.hasSecond.push(false);while(c.waku2.length<state.accounts.length)c.waku2.push([]);c.owned=c.owned.slice(0,state.accounts.length);c.waku=c.waku.slice(0,state.accounts.length);c.hasSecond=c.hasSecond.slice(0,state.accounts.length);c.waku2=c.waku2.slice(0,state.accounts.length);});
 }
 function load(){
  try{
@@ -184,14 +190,17 @@ function renderChars(){
   list.forEach(function(c){
    h+='<div class="row" style="--n:'+state.accounts.length+'"><div class="char"><div class="avatar">'+(c.image?'<img src="'+c.image+'" alt="">':'⭐')+'</div><div><div class="name">'+displayCharName(c.name)+'</div><div class="meta">'+esc(c.attr)+' / '+esc(c.type)+' / '+esc(c.form)+'</div></div></div>';
    state.accounts.forEach(function(a,i){
-    var ws=c.waku[i]||[];
+    var ws=c.waku[i]||[]; var ws2=c.waku2[i]||[]; var has2=!!(c.hasSecond&&c.hasSecond[i]);
     h+='<div><button class="btn status '+(c.owned[i]?'owned':'')+'" data-toggle-id="'+esc(c.id)+'" data-toggle-index="'+i+'">'+(c.owned[i]?'✓ 所持':'− 未所持')+'</button>';
     if(c.owned[i]){
-     h+='<button class="btn wide" style="margin-top:6px" data-waku-id="'+esc(c.id)+'" data-waku-index="'+i+'">実を設定</button>';
-     if(ws.length){
-      h+='<div class="waku-list">';
-      ws.forEach(function(w){var icon=(w.grade||"L")==="EL"?EL_IMG:L_IMG;h+='<div class="waku-line"><img src="'+icon+'" alt="'+esc(w.grade||"L")+'"><span>'+esc(w.name)+(w.grade||"L")+'</span></div>';});
-      h+='</div>';
+     h+='<button class="btn wide" style="margin-top:6px" data-waku-id="'+esc(c.id)+'" data-waku-index="'+i+'" data-waku-unit="0">1体目：実を設定</button>';
+     if(ws.length){h+='<div class="waku-list">';ws.forEach(function(w){var icon=(w.grade||"L")==="EL"?EL_IMG:L_IMG;h+='<div class="waku-line"><img src="'+icon+'" alt="'+esc(w.grade||"L")+'"><span>'+esc(w.name)+(w.grade||"L")+'</span></div>';});h+='</div>';}
+     if(has2){
+      h+='<button class="btn wide" style="margin-top:6px" data-waku-id="'+esc(c.id)+'" data-waku-index="'+i+'" data-waku-unit="1">2体目：実を設定</button>';
+      if(ws2.length){h+='<div class="waku-list">';ws2.forEach(function(w){var icon=(w.grade||"L")==="EL"?EL_IMG:L_IMG;h+='<div class="waku-line"><img src="'+icon+'" alt="'+esc(w.grade||"L")+'"><span>'+esc(w.name)+(w.grade||"L")+'</span></div>';});h+='</div>';}
+      h+='<button class="btn wide danger" style="margin-top:6px" data-remove-second="'+esc(c.id)+'" data-remove-second-index="'+i+'">2体目を削除</button>';
+     }else{
+      h+='<button class="btn wide" style="margin-top:6px" data-add-second="'+esc(c.id)+'" data-add-second-index="'+i+'">＋ 2体目を追加</button>';
      }
     }
     h+='</div>';
@@ -220,13 +229,15 @@ function renderChars(){
    if(!c)return;
    var i=parseInt(btn.getAttribute("data-toggle-index"),10);
    c.owned[i]=!c.owned[i];
-   if(!c.owned[i])c.waku[i]=[];
+   if(!c.owned[i]){c.waku[i]=[];c.waku2[i]=[];c.hasSecond[i]=false;}
    save();renderChars();
   };
  });
  document.querySelectorAll("[data-waku-id]").forEach(function(btn){
-  btn.onclick=function(){openWaku(btn.getAttribute("data-waku-id"),parseInt(btn.getAttribute("data-waku-index"),10));};
+  btn.onclick=function(){openWaku(btn.getAttribute("data-waku-id"),parseInt(btn.getAttribute("data-waku-index"),10),parseInt(btn.getAttribute("data-waku-unit"),10)||0);};
  });
+ document.querySelectorAll("[data-add-second]").forEach(function(btn){btn.onclick=function(){var c=state.chars.find(function(x){return String(x.id)===String(btn.getAttribute("data-add-second"));});var i=parseInt(btn.getAttribute("data-add-second-index"),10);if(!c)return;c.hasSecond[i]=true;c.waku2[i]=c.waku2[i]||[];save();renderChars();};});
+ document.querySelectorAll("[data-remove-second]").forEach(function(btn){btn.onclick=function(){var c=state.chars.find(function(x){return String(x.id)===String(btn.getAttribute("data-remove-second"));});var i=parseInt(btn.getAttribute("data-remove-second-index"),10);if(!c)return;if(!confirm("2体目のわくわくの実を削除しますか？"))return;c.hasSecond[i]=false;c.waku2[i]=[];state.party=state.party.map(function(slot){if(slot&&String(slot.id)===String(c.id)&&parseInt(slot.unitIndex,10)===1)return {id:"",accountIndex:slot.accountIndex||0,unitIndex:0};return slot;});save();renderChars();};});
 }
 function formatCharName(name){return esc(String(name||"")).replace(/\s+/g,"<br>");}
 function exportData(){
@@ -286,7 +297,7 @@ function renderSettings(){
  if(!list.length)h+='<p class="muted">条件に一致するキャラがいません。</p>';
  h+='</div></div>';
  document.getElementById("app").innerHTML=h;document.getElementById("logoutBtn").onclick=logout;
- document.querySelectorAll("[data-count]").forEach(function(btn){btn.onclick=function(){var n=parseInt(btn.getAttribute("data-count"),10),old=state.accounts.slice();state.accounts=[];for(var i=0;i<n;i++)state.accounts.push(old[i]||("サブ"+(i+1)));state.chars.forEach(function(c){c.owned=c.owned||[];c.waku=c.waku||[];while(c.owned.length<n)c.owned.push(true);while(c.waku.length<n)c.waku.push([]);c.owned=c.owned.slice(0,n);c.waku=c.waku.slice(0,n);});save();renderSettings();};});
+ document.querySelectorAll("[data-count]").forEach(function(btn){btn.onclick=function(){var n=parseInt(btn.getAttribute("data-count"),10),old=state.accounts.slice();state.accounts=[];for(var i=0;i<n;i++)state.accounts.push(old[i]||("サブ"+(i+1)));state.chars.forEach(function(c){c.owned=c.owned||[];c.waku=c.waku||[];while(c.owned.length<n)c.owned.push(true);while(c.waku.length<n)c.waku.push([]);c.hasSecond=c.hasSecond||[];c.waku2=c.waku2||[];while(c.hasSecond.length<n)c.hasSecond.push(false);while(c.waku2.length<n)c.waku2.push([]);c.owned=c.owned.slice(0,n);c.waku=c.waku.slice(0,n);c.hasSecond=c.hasSecond.slice(0,n);c.waku2=c.waku2.slice(0,n);});save();renderSettings();};});
  document.querySelectorAll("[data-account-index]").forEach(function(inp){inp.onchange=function(){var i=parseInt(inp.getAttribute("data-account-index"),10);state.accounts[i]=inp.value.trim()||("サブ"+(i+1));save();};});
  document.getElementById("addChar").onclick=function(){openCharEditor(null);};document.querySelectorAll("[data-edit-char]").forEach(function(btn){btn.onclick=function(){openCharEditor(btn.getAttribute("data-edit-char"));};});
  document.getElementById("exportData").onclick=exportData;document.getElementById("importData").onchange=importData;
@@ -362,7 +373,7 @@ function openCharEditor(editId){
    if(editing){
     editing.name=nameValue;editing.kana=kanaValue;editing.image=imageValue;editing.attr=selected.attr;editing.type=selected.type;editing.form=selected.form;editing.race=selected.race;editing.battleType=selected.battleType;editing.shotType=selected.shotType;
    }else{
-    state.chars.push({id:String(Date.now())+Math.random(),createdAt:Date.now(),name:nameValue,kana:kanaValue,image:imageValue,attr:selected.attr,type:selected.type,form:selected.form,race:selected.race,battleType:selected.battleType,shotType:selected.shotType,owned:state.accounts.map(function(){return true;}),waku:state.accounts.map(function(){return [];})});
+    state.chars.push({id:String(Date.now())+Math.random(),createdAt:Date.now(),name:nameValue,kana:kanaValue,image:imageValue,attr:selected.attr,type:selected.type,form:selected.form,race:selected.race,battleType:selected.battleType,shotType:selected.shotType,owned:state.accounts.map(function(){return true;}),waku:state.accounts.map(function(){return [];}),hasSecond:state.accounts.map(function(){return false;}),waku2:state.accounts.map(function(){return []})});
    }
    save();
    var savedChar=editing||state.chars[state.chars.length-1];
@@ -379,9 +390,11 @@ function openCharEditor(editId){
  }
  draw();
 }
-function openWaku(id,accountIndex){
+function openWaku(id,accountIndex,unitIndex){
  var c=state.chars.find(function(x){return String(x.id)===String(id);});if(!c)return;
- var working=(c.waku[accountIndex]||[]).map(function(x){return {name:x.name,grade:x.grade||"L"};});
+ unitIndex=unitIndex===1?1:0;
+ var source=unitIndex===1?(c.waku2[accountIndex]||[]):(c.waku[accountIndex]||[]);
+ var working=source.map(function(x){return {name:x.name,grade:x.grade||"L"};});
  var overlay=document.createElement("div");overlay.className="modalback";
  var modal=document.createElement("div");modal.className="modal";overlay.appendChild(modal);document.body.appendChild(overlay);
  function draw(){
@@ -389,7 +402,7 @@ function openWaku(id,accountIndex){
    var icon=w.grade==="EL"?EL_IMG:L_IMG;return '<div class="waku"><span style="display:flex;align-items:center;gap:6px"><img src="'+icon+'" style="width:28px;height:28px;border-radius:6px;object-fit:cover;flex:none" alt="'+esc(w.grade)+'">'+esc(w.name)+esc(w.grade)+'</span><div class="waku-actions"><button class="btn" data-grade="'+i+'">'+(w.grade==="L"?"ELにする":"Lに戻す")+'</button><button class="btn" data-remove="'+i+'">削除</button></div></div>';
   }).join(""):'<p class="muted">まだ選択されていません</p>';
   var h='<div class="modalhead"><h2>わくわくの実</h2><div><button id="saveWaku" class="btn primary">保存</button><button id="closeWaku" class="btn">閉じる</button></div></div>'+
-   '<p class="muted">'+esc(c.name)+' / '+esc(state.accounts[accountIndex])+'（最大4個）</p><h3>現在選択中</h3>'+current+
+   '<p class="muted">'+esc(c.name)+' / '+esc(state.accounts[accountIndex])+' / '+(unitIndex===1?'2体目':'1体目')+'（最大4個）</p><h3>現在選択中</h3>'+current+
    '<div style="margin-top:10px"><button class="btn" data-add-slot="1">＋ 4つ目を追加</button></div>'+
    '<h3>プリセット</h3><div class="presetgrid">';
   Object.keys(PRESETS).forEach(function(k){h+='<button class="btn" data-preset="'+esc(k)+'">'+esc(k)+'</button>';});
@@ -401,7 +414,7 @@ function openWaku(id,accountIndex){
   modal.querySelectorAll("[data-add-waku]").forEach(function(b){b.onclick=function(){var n=b.getAttribute("data-add-waku");var emptyIndex=working.findIndex(function(w){return w.empty;});if(emptyIndex>=0){if(working.some(function(w){return !w.empty&&w.name===n;}))return;working[emptyIndex]={name:n,grade:"L"};draw();return;}if(working.length>=4)return;if(working.some(function(w){return !w.empty&&w.name===n;}))return;working.push({name:n,grade:"L"});draw();};});
   modal.querySelectorAll("[data-grade]").forEach(function(b){b.onclick=function(){var i=parseInt(b.getAttribute("data-grade"),10);working[i].grade=working[i].grade==="L"?"EL":"L";draw();};});
   modal.querySelectorAll("[data-remove]").forEach(function(b){b.onclick=function(){working.splice(parseInt(b.getAttribute("data-remove"),10),1);draw();};});
-  modal.querySelector("#saveWaku").onclick=function(){c.waku[accountIndex]=working;save();overlay.remove();renderChars();};
+  modal.querySelector("#saveWaku").onclick=function(){if(unitIndex===1){c.hasSecond[accountIndex]=true;c.waku2[accountIndex]=working;}else c.waku[accountIndex]=working;save();overlay.remove();renderChars();};
   modal.querySelector("#closeWaku").onclick=function(){overlay.remove();};
  }
  draw();
@@ -427,7 +440,7 @@ function getPartyEntriesForSlots(slots){
   var c=state.chars.find(function(x){return String(x.id)===String(slot.id);});
   if(!c)return;
   var ai=Math.max(0,Math.min(state.accounts.length-1,parseInt(slot.accountIndex,10)||0));
-  (c.waku[ai]||[]).forEach(function(w){entries.push({slotIndex:slotIndex,c:c,w:w,accountIndex:ai});});
+  var ui=parseInt(slot.unitIndex,10)===1?1:0;var ws=ui===1?(c.waku2[ai]||[]):(c.waku[ai]||[]);ws.forEach(function(w){entries.push({slotIndex:slotIndex,c:c,w:w,accountIndex:ai,unitIndex:ui});});
  });
  return entries;
 }
@@ -481,13 +494,13 @@ function getTargetDamageBreakdown(slots,targetIndex){
  });
  return Object.keys(best).map(function(k){return best[k];});
 }
-function renderPartyWakuList(c,ai,compact){
- var ws=(c.waku[ai]||[]);
+function renderPartyWakuList(c,ai,compact,unitIndex){
+ var ui=parseInt(unitIndex,10)===1?1:0;var ws=ui===1?(c.waku2[ai]||[]):(c.waku[ai]||[]);
  if(!ws.length)return '<div class="muted">未設定</div>';
  return ws.map(function(w){return '<div class="'+(compact?'saved-party-waku-line':'party-waku-line')+'"><img src="'+((w.grade||"L")==="EL"?EL_IMG:L_IMG)+'" alt=""><span>'+esc(w.name)+(w.grade||"L")+'</span></div>';}).join('');
 }
 function drawInlinePartyPicker(){
- var slot=state.party[partyPickSlot]||{id:"",accountIndex:0};
+ var slot=state.party[partyPickSlot]||{id:"",accountIndex:0,unitIndex:0};
  var accountSel=document.getElementById('inlinePartyAccount'),search=document.getElementById('inlinePartySearch'),list=document.getElementById('inlinePartyPickerList');
  if(!accountSel||!search||!list)return;
  var ai=parseInt(accountSel.value,10)||0;
@@ -502,10 +515,15 @@ function drawInlinePartyPicker(){
  });
  arr.sort(function(a,b){var ka=(a.attr||"")+"|"+(a.type||"")+"|"+(a.shotType||"")+"|"+(a.name||"");var kb=(b.attr||"")+"|"+(b.type||"")+"|"+(b.shotType||"")+"|"+(b.name||"");return ka.localeCompare(kb,"ja");});
  list.innerHTML=arr.length?arr.map(function(c){
-  var selected=String(c.id)===String(slot.id);
-  return '<div class="party-picker-item '+(selected?'selected':'')+'" data-inline-pick-party="'+esc(c.id)+'"><div class="party-picker-avatar">'+(c.image?'<img src="'+c.image+'" alt="">':'⭐')+'</div><div style="min-width:0"><b>'+displayCharName(c.name)+'</b><div class="party-picker-meta">'+esc(c.kana||'')+' / '+esc(c.attr||'')+' / '+esc(c.type||'')+' / '+esc(c.shotType||'')+'</div></div></div>';
+  var has2=!!(c.hasSecond&&c.hasSecond[ai]);
+  var selected1=String(c.id)===String(slot.id)&&parseInt(slot.unitIndex,10)!==1;
+  var selected2=String(c.id)===String(slot.id)&&parseInt(slot.unitIndex,10)===1;
+  var buttons=has2?'<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px"><button class="btn '+(selected1?'primary':'')+'" data-inline-pick-party="'+esc(c.id)+'" data-inline-unit="0">1体目</button><button class="btn '+(selected2?'primary':'')+'" data-inline-pick-party="'+esc(c.id)+'" data-inline-unit="1">2体目</button></div>':'';
+  var clickAttr=has2?'':' data-single-pick="'+esc(c.id)+'"';
+  return '<div class="party-picker-item '+((selected1||selected2)?'selected':'')+'"'+clickAttr+'><div class="party-picker-avatar">'+(c.image?'<img src="'+c.image+'" alt="">':'⭐')+'</div><div style="min-width:0;flex:1"><b>'+displayCharName(c.name)+'</b><div class="party-picker-meta">'+esc(c.kana||'')+' / '+esc(c.attr||'')+' / '+esc(c.type||'')+' / '+esc(c.shotType||'')+'</div>'+buttons+'</div></div>';
  }).join(''):'<div class="muted" style="padding:14px">該当するキャラがありません</div>';
- list.querySelectorAll('[data-inline-pick-party]').forEach(function(item){item.onclick=function(){state.party[partyPickSlot]={id:item.getAttribute('data-inline-pick-party'),accountIndex:parseInt(accountSel.value,10)||0};save();renderParty();};});
+ list.querySelectorAll('[data-inline-pick-party]').forEach(function(item){item.onclick=function(e){e.stopPropagation();state.party[partyPickSlot]={id:item.getAttribute('data-inline-pick-party'),accountIndex:parseInt(accountSel.value,10)||0,unitIndex:parseInt(item.getAttribute('data-inline-unit'),10)||0};save();renderParty();};});
+ list.querySelectorAll('[data-single-pick]').forEach(function(item){item.onclick=function(){state.party[partyPickSlot]={id:item.getAttribute('data-single-pick'),accountIndex:parseInt(accountSel.value,10)||0,unitIndex:0};save();renderParty();};});
 }
 function createPartyGroup(){
  var input=document.getElementById('partyGroupInput');var name=(input&&input.value||partyGroupDraft||'').trim();
@@ -528,7 +546,7 @@ function registerCurrentParty(){
  if(!name){alert('「〇〇用」など、編成名を入力してください。');if(nameInput)nameInput.focus();return;}
  var filled=state.party.filter(function(x){return x&&x.id;}).length;
  if(filled<4){alert('4キャラを選択してから登録してください。');return;}
- var slots=state.party.map(function(x){return {id:x.id,accountIndex:x.accountIndex||0};});
+ var slots=state.party.map(function(x){return {id:x.id,accountIndex:x.accountIndex||0,unitIndex:parseInt(x.unitIndex,10)===1?1:0};});
  if(editingSavedPartyId){
   var target=state.savedParties.find(function(p){return String(p.id)===String(editingSavedPartyId);});
   if(target){target.name=name;target.groupId=groupId;target.guardianId=state.guardianId||"";target.slots=slots;}
@@ -546,7 +564,7 @@ function editSavedParty(id){
  partyGroupDraft=String(p.groupId||'');
  partyGroupFilter=String(p.groupId||'すべて');
  state.guardianId=String(p.guardianId||'');
- state.party=p.slots.slice(0,4).map(function(x){return {id:x&&x.id?String(x.id):'',accountIndex:Math.max(0,Math.min(state.accounts.length-1,parseInt(x&&x.accountIndex,10)||0))};});
+ state.party=p.slots.slice(0,4).map(function(x){return {id:x&&x.id?String(x.id):'',accountIndex:Math.max(0,Math.min(state.accounts.length-1,parseInt(x&&x.accountIndex,10)||0)),unitIndex:parseInt(x&&x.unitIndex,10)===1?1:0};});
  while(state.party.length<4)state.party.push({id:'',accountIndex:0});
  partyPickSlot=0;
  partySearchDrafts=['','','',''];
@@ -571,7 +589,7 @@ function renderSavedParty(p){
   var ai=Math.max(0,Math.min(state.accounts.length-1,parseInt(slot.accountIndex,10)||0));
   var c=state.chars.find(function(x){return String(x.id)===String(slot.id);});
   h+='<div class="saved-party-char">';
-  if(c){h+='<div class="saved-party-char-top"><div class="saved-party-char-avatar">'+(c.image?'<img src="'+c.image+'" alt="">':'⭐')+'</div><div style="min-width:0"><div class="saved-party-char-name">'+esc(c.name)+'</div><div class="saved-party-char-meta">'+esc(state.accounts[ai]||'')+' / '+esc(c.race||'種族未設定')+' / '+esc(c.battleType||'')+' / '+esc(c.shotType||'')+'</div></div></div><div class="saved-party-waku">'+renderPartyWakuList(c,ai,true)+'</div><div class="saved-party-damage"><span>このキャラの加撃</span><b>+'+getTargetDamage(p.slots,i).toLocaleString()+'</b></div>';}
+  if(c){h+='<div class="saved-party-char-top"><div class="saved-party-char-avatar">'+(c.image?'<img src="'+c.image+'" alt="">':'⭐')+'</div><div style="min-width:0"><div class="saved-party-char-name">'+esc(c.name)+'</div><div class="saved-party-char-meta">'+esc(state.accounts[ai]||'')+' / '+esc(c.race||'種族未設定')+' / '+esc(c.battleType||'')+' / '+esc(c.shotType||'')+'</div></div></div><div class="saved-party-waku">'+renderPartyWakuList(c,ai,true,slot.unitIndex)+'</div><div class="saved-party-damage"><span>このキャラの加撃</span><b>+'+getTargetDamage(p.slots,i).toLocaleString()+'</b></div>';}
   else h+='<div class="muted">未設定</div>';
   h+='</div>';
  });
@@ -596,10 +614,10 @@ function renderParty(){
  var pg=state.guardians.find(function(g){return String(g.id)===String(state.guardianId);});
  h+='<div class="card" style="margin-top:14px"><b>現在のパーティー</b><p class="muted">選択した4キャラのわくわくの実と、この編成で各キャラに反映される加撃量を確認できます。変更は上の「キャラを選択」から行えます。</p><div class="party-grid">';
  for(var i=0;i<4;i++){
-  var slot=state.party[i]||{id:"",accountIndex:0},ai=Math.max(0,Math.min(state.accounts.length-1,parseInt(slot.accountIndex,10)||0));
+  var slot=state.party[i]||{id:"",accountIndex:0,unitIndex:0},ai=Math.max(0,Math.min(state.accounts.length-1,parseInt(slot.accountIndex,10)||0));
   var c=chars.find(function(x){return String(x.id)===String(slot.id);});
   h+='<div class="party-slot '+(i===0?'main':'')+'"><span class="badge">'+(i===0?'メイン':'メンバー'+i)+'</span><div class="party-avatar">'+(c&&c.image?'<img src="'+c.image+'" alt="">':'⭐')+'</div><div class="muted" style="font-size:12px">参照アカウント</div><div style="margin-top:7px">'+esc(state.accounts[ai])+'</div>';
-  if(c){h+='<div style="margin-top:8px"><b>'+esc(c.name)+'</b></div><div class="party-waku"><b>わくわくの実</b>'+renderPartyWakuList(c,ai,false)+'</div>';}else{h+='<div class="muted" style="margin-top:8px">未選択</div>';}
+  if(c){h+='<div style="margin-top:8px"><b>'+esc(c.name)+'</b> <span class="badge">'+(parseInt(slot.unitIndex,10)===1?'2体目':'1体目')+'</span></div><div class="party-waku"><b>わくわくの実</b>'+renderPartyWakuList(c,ai,false,slot.unitIndex)+'</div>';}else{h+='<div class="muted" style="margin-top:8px">未選択</div>';}
   h+='</div>';
  }
  h+='</div></div>';
