@@ -316,7 +316,7 @@ function openCharEditor(editId){
  var selected={attr:editing?editing.attr:"火",type:editing?editing.type:"恒常",form:editing?editing.form:"獣神化",race:editing?editing.race:"",battleType:editing?editing.battleType:"バランス",shotType:editing?editing.shotType:"反射"};
  var nameValue=editing?editing.name:"",kanaValue=editing?editing.kana||"":"",imageValue=editing?editing.image||"":"";
  function draw(){
-  modal.innerHTML='<div class="modalhead"><h2>'+(editing?'キャラを編集':'キャラを追加')+'</h2><button id="cancelChar" class="btn">閉じる</button></div>'+ 
+  modal.innerHTML='<div class="modalhead"><h2>'+(editing?'キャラを編集':'キャラを追加')+'</h2><div><button id="saveCharTop" class="btn primary">'+(editing?'変更を保存':'追加する')+'</button><button id="cancelChar" class="btn">閉じる</button></div></div>'+ 
    '<div class="photo-box"><div id="charPreview" class="photo-preview">'+(imageValue?'<img src="'+imageValue+'" alt="">':'⭐')+'</div><div><b>キャラ画像</b><p class="muted">一覧表のキャラ欄に表示されます。アップロードした画像はキャラ名と紐づけてクラウド共有されます。</p><input id="charImage" type="file" accept="image/*" style="display:none"><button id="addPhoto" type="button" class="btn">写真を追加</button> '+(imageValue?'<button id="removePhoto" type="button" class="btn">画像を削除</button>':'')+'<p class="muted">JPG / PNGなど・自動で小さくして保存します</p></div></div>'+ 
    '<label>キャラ名<input id="charName" class="wide" style="margin-top:5px" placeholder="例：新キャラ" value="'+esc(nameValue)+'"></label>'+ 
    '<label style="display:block;margin-top:10px">よみがな（ひらがな）<input id="charKana" class="wide" style="margin-top:5px" placeholder="例：しんきゃら" value="'+esc(kanaValue)+'"></label>'+ 
@@ -325,6 +325,7 @@ function openCharEditor(editId){
    '<h3>進化形態</h3><div class="choices">'+["獣神化","獣神化・改","真獣神化"].map(function(x){return '<button class="choice '+(selected.form===x?'selected':'')+'" data-form="'+x+'">'+x+'</button>';}).join("")+ '</div>'+ '<h3>種族</h3><button type="button" id="openRacePicker" class="btn wide">'+(selected.race?('種族：'+selected.race):'種族を選択')+'</button><div class="race-picker-note">ボタンを押すと種族一覧から選択できます</div><h3>戦型</h3><div class="choices">'+BATTLE_TYPES.map(function(x){return '<button class="choice '+(selected.battleType===x?'selected':'')+'" data-battle="'+x+'">'+x+'</button>';}).join("")+'</div>'+ '<h3>撃種</h3><div class="choices">'+SHOT_TYPES.map(function(x){return '<button class="choice '+(selected.shotType===x?'selected':'')+'" data-shot="'+x+'">'+x+'</button>';}).join("")+'</div>'+ 
    '<button id="confirmChar" class="btn primary wide" style="margin-top:12px">'+(editing?'変更を保存':'追加する')+'</button>'+ 
    (editing?'<button id="deleteChar" class="btn wide" style="margin-top:8px">このキャラを削除</button>':'');
+  modal.querySelector("#saveCharTop").onclick=function(){modal.querySelector("#confirmChar").click();};
   modal.querySelector("#addPhoto").onclick=function(){modal.querySelector("#charImage").click();};
   modal.querySelector("#charImage").onchange=function(){
    var file=this.files&&this.files[0];if(!file)return;
