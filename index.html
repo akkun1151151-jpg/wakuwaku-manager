@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>わくわく管理 v1.3.1</title>
+<title>わくわく管理 v1.3.2</title>
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png">
 <link rel="apple-touch-icon" sizes="180x180" href="./icons/icon-180.png">
@@ -27,7 +27,7 @@ input,select{border:1px solid #dfe2e8;border-radius:10px;padding:10px 12px;backg
 </style>
 </head>
 <body>
-<header><div class="logo">⭐ わくわく管理 <span class="muted">v1.3.1</span></div><div class="nav"><button id="navChars" class="active">キャラ管理</button><button id="navParty">高難易度編成</button><button id="navSettings">設定</button></div></header>
+<header><div class="logo">⭐ わくわく管理 <span class="muted">v1.3.2</span></div><div class="nav"><button id="navChars" class="active">キャラ管理</button><button id="navParty">高難易度編成</button><button id="navSettings">設定</button></div></header>
 <main id="app"></main>
 <script>
 if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js").catch(function(e){console.warn("PWA service worker registration failed",e);});});}
@@ -316,7 +316,7 @@ function openCharEditor(editId){
  var selected={attr:editing?editing.attr:"火",type:editing?editing.type:"恒常",form:editing?editing.form:"獣神化",race:editing?editing.race:"",battleType:editing?editing.battleType:"バランス",shotType:editing?editing.shotType:"反射"};
  var nameValue=editing?editing.name:"",kanaValue=editing?editing.kana||"":"",imageValue=editing?editing.image||"":"";
  function draw(){
-  modal.innerHTML='<div class="modalhead"><h2>'+(editing?'キャラを編集':'キャラを追加')+'</h2><button id="cancelChar" class="btn">閉じる</button></div>'+ 
+  modal.innerHTML='<div class="modalhead"><h2>'+(editing?'キャラを編集':'キャラを追加')+'</h2><div><button id="confirmCharTop" class="btn primary">'+(editing?'変更を保存':'追加する')+'</button><button id="cancelChar" class="btn">閉じる</button></div></div>'+ 
    '<div class="photo-box"><div id="charPreview" class="photo-preview">'+(imageValue?'<img src="'+imageValue+'" alt="">':'⭐')+'</div><div><b>キャラ画像</b><p class="muted">一覧表のキャラ欄に表示されます。アップロードした画像はキャラ名と紐づけてクラウド共有されます。</p><input id="charImage" type="file" accept="image/*" style="display:none"><button id="addPhoto" type="button" class="btn">写真を追加</button> '+(imageValue?'<button id="removePhoto" type="button" class="btn">画像を削除</button>':'')+'<p class="muted">JPG / PNGなど・自動で小さくして保存します</p></div></div>'+ 
    '<label>キャラ名<input id="charName" class="wide" style="margin-top:5px" placeholder="例：新キャラ" value="'+esc(nameValue)+'"></label>'+ 
    '<label style="display:block;margin-top:10px">よみがな（ひらがな）<input id="charKana" class="wide" style="margin-top:5px" placeholder="例：しんきゃら" value="'+esc(kanaValue)+'"></label>'+ 
@@ -380,6 +380,7 @@ function openCharEditor(editId){
    var sharedSync=(editing&&oldName!==nameValue)?renameSharedCharacterImage(oldName,nameValue,imageValue):(imageValue?syncSharedCharacter(savedChar):Promise.resolve());
    Promise.resolve(sharedSync).then(function(){applySharedImages();overlay.remove();renderSettings();});
   };
+  modal.querySelector("#confirmCharTop").onclick=function(){modal.querySelector("#confirmChar").click();};
   if(editing){
    modal.querySelector("#deleteChar").onclick=function(){
     if(!confirm("「"+editing.name+"」を削除しますか？\\n所持状況や設定したわくわくの実もすべて削除されます。"))return;

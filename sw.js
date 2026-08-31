@@ -1,4 +1,4 @@
-const CACHE_NAME = 'wakuwaku-v1.3.0';
+const CACHE_NAME = 'wakuwaku-v1.3.2';
 const APP_SHELL = [
   './',
   './index.html',
